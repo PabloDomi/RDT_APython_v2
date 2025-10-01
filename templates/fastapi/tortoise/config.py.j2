@@ -1,0 +1,14 @@
+"""
+Tortoise ORM configuration
+"""
+TORTOISE_ORM = {
+    "connections": {
+        "default": "sqlite://{{ name }}.db"
+    },
+    "apps": {
+        "models": {
+            "models": ["src.models"],
+            "default_connection": "default",
+        }
+    }
+}

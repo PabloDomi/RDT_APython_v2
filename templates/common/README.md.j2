@@ -1,0 +1,88 @@
+# {{ name | title_case }}
+
+> API project generated with RDT v2.0
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Python {{ python_version }}+
+- {{ database }}{% if database != 'SQLite' %} server{% endif %}
+
+### Installation
+
+```bash
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # Linux/macOS
+# venv\Scripts\activate  # Windows
+
+# Install dependencies
+pip install -r requirements.txt
+```
+
+### Configuration
+
+```bash
+# Copy environment template
+cp .env.example .env
+
+# Edit .env with your settings
+nano .env
+```
+
+### Database Setup
+
+{% if orm == 'SQLAlchemy' and framework == 'Flask-Restx' %}
+```bash
+flask db init
+flask db migrate -m "Initial migration"
+flask db upgrade
+```
+{% elif orm == 'SQLAlchemy' and framework == 'FastAPI' %}
+```bash
+alembic revision --autogenerate -m "Initial migration"
+alembic upgrade head
+```
+{% elif orm == 'TortoiseORM' %}
+```bash
+aerich init -t src.config.config.TORTOISE_ORM
+aerich init-db
+```
+{% endif %}
+
+### Run Server
+
+```bash
+{% if framework == 'Flask-Restx' %}
+python app.py
+{% elif framework == 'FastAPI' %}
+uvicorn src.main:app --reload
+{% elif framework == 'Django-Rest' %}
+python manage.py runserver
+{% endif %}
+```
+
+Visit: http://localhost:{{ port }}{% if framework == 'FastAPI' %}/docs{% endif %}
+
+## 🧪 Testing
+
+```bash
+pytest
+pytest --cov=src
+```
+
+## 🐳 Docker
+
+```bash
+docker-compose up -d
+```
+
+## 📚 Documentation
+
+- Framework: [{{ framework }}](https://{{ framework | lower | replace('-', '') }}.com)
+- ORM: [{{ orm }}](https://{{ orm | lower }}.org)
+
+## 📝 License
+
+MIT

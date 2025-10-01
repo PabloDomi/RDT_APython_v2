@@ -1,0 +1,76 @@
+[tool.poetry]
+name = "rdt-api-generator"
+version = "2.0.0"
+description = "Professional API project generator for Python - Flask, FastAPI, Django-Rest"
+authors = ["Your Name <Domi@usal.es>"]
+license = "MIT"
+readme = "README.md"
+homepage = "https://github.com/PabloDomi/RDT_APython_v2"
+repository = "https://github.com/PabloDomi/RDT_APython_v2"
+keywords = ["api", "generator", "flask", "fastapi", "django", "scaffolding", "boilerplate"]
+packages = [{include = "rdt"}]
+include = ["templates/**/*.j2"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Code Generators",
+    "Topic :: Software Development :: Libraries :: Application Frameworks",
+]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+click = "^8.1.7"
+jinja2 = "^3.1.2"
+pydantic = "^2.5.0"
+pydantic-settings = "^2.1.0"
+rich = "^13.7.0"
+inquirerpy = "^0.3.4"
+colorama = "^0.4.6"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.3"
+pytest-cov = "^4.1.0"
+pytest-mock = "^3.12.0"
+black = "^23.12.0"
+mypy = "^1.7.1"
+ruff = "^0.1.8"
+pre-commit = "^3.6.0"
+
+[tool.poetry.scripts]
+rdt = "rdt.cli.commands:cli"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 100
+target-version = ['py311']
+include = '\.pyi?$'
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+select = ["E", "F", "W", "I", "N", "UP", "B", "A", "C4", "PT"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"
+addopts = "-v --cov=rdt --cov-report=html --cov-report=term-missing"
+markers = [
+    "integration: marks tests as integration tests (deselect with '-m \"not integration\"')",
+]

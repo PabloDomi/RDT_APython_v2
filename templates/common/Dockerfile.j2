@@ -1,0 +1,57 @@
+# Multi-stage build for {{ name }}
+FROM python:{{ python_version }}-slim as builder
+
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    {% if database == 'PostgreSQL' -%}
+    libpq-dev \
+    {% elif database == 'MySQL' -%}
+    default-libmysqlclient-dev \
+    {% endif -%}
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir --user -r requirements.txt
+
+# Production stage
+FROM python:{{ python_version }}-slim
+
+WORKDIR /app
+
+# Copy dependencies from builder
+COPY --from=builder /root/.local /root/.local
+
+# Install runtime dependencies
+{% if database == 'PostgreSQL' -%}
+RUN apt-get update && apt-get install -y libpq5 && rm -rf /var/lib/apt/lists/*
+{% elif database == 'MySQL' -%}
+RUN apt-get update && apt-get install -y default-mysql-client && rm -rf /var/lib/apt/lists/*
+{% endif -%}
+
+# Copy application
+COPY . .
+
+# Create non-root user
+RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /app
+USER appuser
+
+# Make PATH available
+ENV PATH=/root/.local/bin:$PATH
+
+{% if framework == 'FastAPI' -%}
+# FastAPI
+EXPOSE {{ port }}
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "{{ port }}"]
+{% else -%}
+# Flask
+EXPOSE {{ port }}
+CMD ["gunicorn", "--bind", "0.0.0.0:{{ port }}", "--workers", "4", "app:app"]
+{% endif -%}
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD python -c "import requests; requests.get('http://localhost:{{ port }}/health')" || exit 1

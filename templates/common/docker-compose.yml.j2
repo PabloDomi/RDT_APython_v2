@@ -1,0 +1,94 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: {{ name }}_app
+    ports:
+      - "{{ port }}:{{ port }}"
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      {% if auth_enabled -%}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      {% endif -%}
+      - ENVIRONMENT=${ENVIRONMENT:-development}
+    {% if database != 'SQLite' -%}
+    depends_on:
+      db:
+        condition: service_healthy
+    {% endif -%}
+    volumes:
+      - .:/app
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  {% if database == 'PostgreSQL' -%}
+  db:
+    image: postgres:15-alpine
+    container_name: {{ name }}_db
+    environment:
+      POSTGRES_USER: ${PGUSER:-postgres}
+      POSTGRES_PASSWORD: ${PGPASSWORD:-postgres}
+      POSTGRES_DB: {{ name }}_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${PGUSER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+  {% elif database == 'MySQL' -%}
+  db:
+    image: mysql:8.0
+    container_name: {{ name }}_db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: {{ name }}_db
+      MYSQL_USER: ${MYSQL_USER:-appuser}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-apppassword}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+  {% endif -%}
+
+  redis:
+    image: redis:7-alpine
+    container_name: {{ name }}_redis
+    ports:
+      - "6379:6379"
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+networks:
+  app-network:
+    driver: bridge
+
+{% if database != 'SQLite' -%}
+volumes:
+  {% if database == 'PostgreSQL' -%}
+  postgres_data:
+  {% elif database == 'MySQL' -%}
+  mysql_data:
+  {% endif -%}
+{% endif -%}
