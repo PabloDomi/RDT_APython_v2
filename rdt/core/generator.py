@@ -3,10 +3,10 @@ Main project generator using Strategy Pattern
 """
 from pathlib import Path
 from typing import Optional
+import shutil
 from .config import ProjectConfig
 from .renderer import TemplateRenderer, TemplateRegistry
 from .dependencies import DependencyManager
-from ..strategies.base import BaseStrategy
 from ..strategies.flask_restx import FlaskRestxStrategy
 from ..strategies.fastapi import FastAPIStrategy
 from ..strategies.django_rest import DjangoRestStrategy
@@ -89,7 +89,7 @@ class ProjectGenerator:
 
             # Generate tests if enabled
             if config.testing_suite:
-                self._generate_tests(project_path, config, strategy)
+                self._generate_tests(project_path, config)
 
             # Generate Docker if enabled
             if config.docker_support:
@@ -100,7 +100,6 @@ class ProjectGenerator:
         except Exception as e:
             # Clean up on failure
             if project_path.exists():
-                import shutil
                 shutil.rmtree(project_path)
             raise e
 
@@ -184,7 +183,6 @@ class ProjectGenerator:
         self,
         project_path: Path,
         config: ProjectConfig,
-        strategy: BaseStrategy
     ):
         """Generate test files"""
         context = config.model_dump_safe()

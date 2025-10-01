@@ -162,14 +162,14 @@ class ProjectConfig(BaseModel):
 COMPATIBILITY_MATRIX = {
     'Flask-Restx': {
         'compatible_orms': ['SQLAlchemy', 'Pewee'],
-        'incompatible_orms': ['TortoiseORM'],
+        'incompatible_orms': ['TortoiseORM', 'DjangoORM'],
         'reason': 'Flask is synchronous, TortoiseORM is async-only',
         'databases': ['PostgreSQL', 'MySQL', 'SQLite'],
         'async_support': False,
     },
     'FastAPI': {
         'compatible_orms': ['SQLAlchemy', 'TortoiseORM'],
-        'incompatible_orms': ['Pewee'],
+        'incompatible_orms': ['Pewee', 'DjangoORM'],
         'reason': 'FastAPI is async, Pewee is sync-only',
         'databases': ['PostgreSQL', 'MySQL', 'SQLite'],
         'async_support': True,
@@ -230,6 +230,10 @@ def quick_validate(
         errors.append("Project name is required")
     elif Path(name).exists():
         errors.append(f"Directory '{name}' already exists")
+
+    # Validate database
+    if database not in ["PostgreSQL", "MySQL", "SQLite"]:
+        errors.append(f"Invalid database: {database}")
 
     # Validate combination
     try:

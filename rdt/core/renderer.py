@@ -215,22 +215,16 @@ class TemplateRegistry:
         'Flask-Restx': {
             'SQLAlchemy': {
                 'init': 'flask_restx/sqlalchemy/__init__.py.j2',
-                'init_auth': 'flask_restx/sqlalchemy/__init___auth.py.j2',
                 'extensions': 'flask_restx/sqlalchemy/extensions.py.j2',
-                'extensions_auth': 'flask_restx/sqlalchemy/extensions_auth.py.j2',
                 'models': 'flask_restx/sqlalchemy/models.py.j2',
                 'routes': 'flask_restx/sqlalchemy/routes.py.j2',
-                'routes_auth': 'flask_restx/sqlalchemy/routes_auth.py.j2',
                 'config': 'flask_restx/sqlalchemy/config.py.j2',
             },
             'Pewee': {
                 'init': 'flask_restx/pewee/__init__.py.j2',
-                'init_auth': 'flask_restx/pewee/__init___auth.py.j2',
                 'extensions': 'flask_restx/pewee/extensions.py.j2',
-                'extensions_auth': 'flask_restx/pewee/extensions_auth.py.j2',
                 'models': 'flask_restx/pewee/models.py.j2',
                 'routes': 'flask_restx/pewee/routes.py.j2',
-                'routes_auth': 'flask_restx/pewee/routes_auth.py.j2',
                 'config': 'flask_restx/pewee/config.py.j2',
             },
         },
@@ -278,6 +272,8 @@ class TemplateRegistry:
         'security': 'common/security.py.j2',
         'pytest_ini': 'common/pytest.ini.j2',
         'pyproject_toml': 'common/pyproject.toml.j2',
+        'config': 'common/config.py.j2',
+        'License': 'common/LICENSE.j2'
     }
 
     # Test templates

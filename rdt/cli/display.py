@@ -2,6 +2,7 @@
 """
 Display utilities using Rich
 """
+import time
 from pathlib import Path
 from typing import List
 from rich.console import Console
@@ -9,7 +10,6 @@ from rich.panel import Panel
 from rich.table import Table
 from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn
 from rich.markdown import Markdown
-import time
 
 from ..core.config import ProjectConfig
 from ..core.generator import ProjectGenerator

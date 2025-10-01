@@ -31,19 +31,17 @@ class FlaskRestxStrategy(BaseStrategy):
         )
 
         # src/__init__.py (app factory)
-        init_key = 'init_auth' if self.config.auth_enabled else 'init'
-        if init_key in templates:
+        if 'init' in templates:
             self.renderer.render_to_file(
-                templates[init_key],
+                templates['init'],
                 project_path / 'src' / '__init__.py',
                 self.context
             )
 
         # src/extensions.py
-        ext_key = 'extensions_auth' if self.config.auth_enabled else 'extensions'
-        if ext_key in templates:
+        if 'extensions' in templates:
             self.renderer.render_to_file(
-                templates[ext_key],
+                templates['extensions'],
                 project_path / 'src' / 'extensions.py',
                 self.context
             )
@@ -65,10 +63,9 @@ class FlaskRestxStrategy(BaseStrategy):
             )
 
         # src/routes/routes_example.py
-        route_key = 'routes_auth' if self.config.auth_enabled else 'routes'
-        if route_key in templates:
+        if 'routes' in templates:
             self.renderer.render_to_file(
-                templates[route_key],
+                templates['routes'],
                 project_path / 'src' / 'routes' / 'routes_example.py',
                 self.context
             )
