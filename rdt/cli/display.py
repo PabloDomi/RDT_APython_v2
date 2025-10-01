@@ -29,7 +29,7 @@ def show_welcome():
     ║                                           ║
     ╚═══════════════════════════════════════════╝
     """
-    
+
     console.print(Panel.fit(
         banner,
         border_style="cyan",
@@ -46,7 +46,7 @@ def show_summary(config: ProjectConfig):
     )
     table.add_column("Setting", style="cyan", width=20)
     table.add_column("Value", style="green")
-    
+
     table.add_row("Project Name", config.name)
     table.add_row("Framework", config.framework)
     table.add_row("ORM", config.orm)
@@ -56,7 +56,7 @@ def show_summary(config: ProjectConfig):
     table.add_row("Testing", "✅ Included" if config.testing_suite else "❌ Not included")
     table.add_row("Git Init", "✅ Yes" if config.git_init else "❌ No")
     table.add_row("Output Path", str(config.get_output_path()))
-    
+
     console.print("\n")
     console.print(table)
     console.print("\n")
@@ -68,7 +68,7 @@ def show_generation_progress(
 ) -> Path:
     """
     Show generation progress with spinner
-    
+
     Returns:
         Path to generated project
     """
@@ -79,29 +79,29 @@ def show_generation_progress(
         TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
         console=console
     ) as progress:
-        
+
         task = progress.add_task("🔨 Generating project...", total=100)
-        
+
         # Start generation
         progress.update(task, advance=10, description="📁 Creating directories...")
         time.sleep(0.3)
-        
+
         progress.update(task, advance=20, description="📝 Generating files...")
         time.sleep(0.3)
-        
+
         progress.update(task, advance=20, description="⚙️  Configuring project...")
-        
+
         # Actually generate
         project_path = generator.generate(config)
-        
+
         progress.update(task, advance=30, description="📦 Setting up dependencies...")
         time.sleep(0.2)
-        
+
         progress.update(task, advance=20, description="✨ Finalizing...")
         time.sleep(0.2)
-        
+
         progress.update(task, advance=0, description="✅ Complete!", completed=100)
-    
+
     return project_path
 
 
@@ -144,7 +144,7 @@ cp .env.example .env
 
 ### 5. Initialize database
 """
-    
+
     # Add database-specific commands
     if config.orm == 'SQLAlchemy' and config.framework == 'Flask-Restx':
         steps += """```bash
@@ -166,22 +166,22 @@ aerich init -t src.config.config.TORTOISE_ORM
 aerich init-db
 ```
 """
-    
+
     # Add run command
     steps += """
 ### 6. Run the server
 ```bash
 """
-    
+
     if config.framework == 'Flask-Restx':
         steps += "python app.py\n"
     elif config.framework == 'FastAPI':
         steps += "uvicorn src.main:app --reload\n"
     elif config.framework == 'Django-Rest':
         steps += "python manage.py runserver\n"
-    
+
     steps += "```\n\n"
-    
+
     # Add documentation URL
     if config.framework == 'Flask-Restx':
         steps += "### 7. Visit API docs\n"
@@ -189,7 +189,7 @@ aerich init-db
     elif config.framework == 'FastAPI':
         steps += "### 7. Visit API docs\n"
         steps += f"🌐 http://localhost:{config.get_port()}/docs\n\n"
-    
+
     # Docker instructions
     if config.docker_support:
         steps += """## 🐳 Docker (Alternative)
@@ -198,7 +198,7 @@ aerich init-db
 docker-compose up -d
 ```
 """
-    
+
     # Testing instructions
     if config.testing_suite:
         steps += """
@@ -209,7 +209,7 @@ pytest
 pytest --cov=src --cov-report=html
 ```
 """
-    
+
     steps += """
 ## 📚 Resources
 
@@ -221,7 +221,7 @@ pytest --cov=src --cov-report=html
 
 **Happy coding! 🎨**
     """
-    
+
     md = Markdown(steps)
     console.print("\n")
     console.print(Panel(md, border_style="green", padding=(1, 2)))
@@ -230,7 +230,7 @@ pytest --cov=src --cov-report=html
 def show_error(title: str, errors: List[str]):
     """Show error messages"""
     error_text = "\n".join(f"• {error}" for error in errors)
-    
+
     console.print("\n")
     console.print(Panel(
         f"[bold red]{title}[/bold red]\n\n{error_text}",

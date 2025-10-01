@@ -49,28 +49,28 @@ def verify_password(password: str, password_hash: str) -> bool:
     return check_password_hash(password_hash, password)
 class InputSanitizer:
     """Sanitize user input"""
-    
+
     @staticmethod
     def sanitize_email(email: str) -> str:
         """Validate and sanitize email"""
         email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-        
+
         if not re.match(email_pattern, email):
             raise ValueError("Invalid email format")
-        
+
         return email.lower().strip()
-    
+
     @staticmethod
     def sanitize_username(username: str) -> str:
         """Validate and sanitize username"""
         username = username.strip()
-        
+
         if len(username) < 3:
             raise ValueError("Username must be at least 3 characters")
-        
+
         if not re.match(r'^[a-zA-Z0-9_-]+$', username):
             raise ValueError("Username can only contain letters, numbers, hyphens and underscores")
-        
+
         return username
 
 

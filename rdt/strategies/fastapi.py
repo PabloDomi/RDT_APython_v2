@@ -37,7 +37,7 @@ class FastAPIStrategy(BaseStrategy):
             self.config.auth_enabled,
             False
         )
-        
+
         # src/main.py (FastAPI app)
         main_key = 'main_auth' if self.config.auth_enabled else 'main'
         if main_key in templates:
@@ -46,7 +46,7 @@ class FastAPIStrategy(BaseStrategy):
                 project_path / 'src' / 'main.py',
                 self.context
             )
-        
+
         # src/database.py or equivalent (for SQLAlchemy)
         if 'database' in templates:
             self.renderer.render_to_file(
@@ -54,7 +54,7 @@ class FastAPIStrategy(BaseStrategy):
                 project_path / 'src' / 'database.py',
                 self.context
             )
-        
+
         # src/config/config.py
         if 'config' in templates:
             self.renderer.render_to_file(
@@ -62,7 +62,7 @@ class FastAPIStrategy(BaseStrategy):
                 project_path / 'src' / 'config' / 'config.py',
                 self.context
             )
-        
+
         # src/models/models.py
         if 'models' in templates:
             self.renderer.render_to_file(
@@ -70,7 +70,7 @@ class FastAPIStrategy(BaseStrategy):
                 project_path / 'src' / 'models' / 'models.py',
                 self.context
             )
-        
+
         # src/routes/routes_example.py
         route_key = 'routes_auth' if self.config.auth_enabled else 'routes'
         if route_key in templates:

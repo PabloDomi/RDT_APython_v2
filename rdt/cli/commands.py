@@ -31,7 +31,7 @@ console = Console()
 def cli():
     """
     🚀 RDT - Rapid Development Tool
-    
+
     Professional API project generator for Python.
     Supports Flask-Restx, FastAPI, and Django-Rest with multiple ORMs.
     """
@@ -65,20 +65,20 @@ def cli():
 def create(name, framework, orm, database, auth, docker, tests, git, interactive):
     """
     Create a new API project
-    
+
     Examples:
-    
+
         # Interactive mode (recommended)
         rdt create
-        
+
         # Quick creation
         rdt create --name my-api --framework FastAPI --orm SQLAlchemy --database PostgreSQL
-        
+
         # No authentication
         rdt create -n my-api -f Flask-Restx -o SQLAlchemy -d SQLite --no-auth
     """
     show_welcome()
-    
+
     try:
         # Interactive mode or use provided options
         if interactive or not all([name, framework, orm, database]):
@@ -95,36 +95,36 @@ def create(name, framework, orm, database, auth, docker, tests, git, interactive
                 testing_suite=tests,
                 git_init=git,
             )
-        
+
         # Show summary
         show_summary(config)
-        
+
         # Confirm in interactive mode
         if interactive:
             if not click.confirm('\n✨ Ready to generate project?', default=True):
                 show_warning("Operation cancelled")
                 return
-        
+
         # Initialize generator
         generator = ProjectGenerator()
-        
+
         # Validate before generation
         is_valid, errors = generator.validate_before_generate(config)
         if not is_valid:
             show_error("Validation failed", errors)
             sys.exit(1)
-        
+
         # Generate project with progress
         project_path = show_generation_progress(generator, config)
-        
+
         # Initialize git if requested
         if config.git_init:
             _init_git(project_path)
-        
+
         # Show success and next steps
         show_success(f"Project created successfully at: {project_path}")
         show_next_steps(project_path, config)
-        
+
     except ValueError as e:
         show_error("Configuration Error", [str(e)])
         sys.exit(1)
@@ -151,23 +151,23 @@ def create(name, framework, orm, database, auth, docker, tests, git, interactive
 def info(framework):
     """
     Show detailed information about a framework
-    
+
     Examples:
         rdt info FastAPI
         rdt info Flask-Restx
     """
-    
+
     framework_info = get_framework_info(framework)
-    
+
     # Create info table
     table = Table(title=f"ℹ️  {framework} Information", show_header=False)
     table.add_column("Property", style="cyan", width=20)
     table.add_column("Value", style="green")
-    
+
     table.add_row("Compatible ORMs", ", ".join(framework_info['compatible_orms']))
     table.add_row("Databases", ", ".join(framework_info['databases']))
     table.add_row("Async Support", "✅ Yes" if framework_info['async_support'] else "❌ No")
-    
+
     if framework_info['incompatible_orms']:
         table.add_row(
             "Incompatible ORMs",
@@ -175,7 +175,7 @@ def info(framework):
             style="red"
         )
         table.add_row("Reason", framework_info['reason'], style="yellow")
-    
+
     console.print("\n")
     console.print(table)
     console.print("\n")
@@ -192,7 +192,7 @@ def info(framework):
 def deps(framework, orm, database, auth):
     """
     Show dependencies for a configuration
-    
+
     Examples:
         rdt deps FastAPI
         rdt deps Flask-Restx --orm SQLAlchemy --database PostgreSQL
@@ -202,7 +202,7 @@ def deps(framework, orm, database, auth):
         orm = get_compatible_orms(framework)[0]
     if not database:
         database = 'PostgreSQL'
-    
+
     # Create config
     config = ProjectConfig(
         name="temp",
@@ -214,19 +214,19 @@ def deps(framework, orm, database, auth):
         testing_suite=True,
         git_init=False,
     )
-    
+
     # Get dependencies
     dependencies = DependencyManager.get_all_dependencies(config)
     deps_info = DependencyManager.get_dependency_info(config)
-    
+
     # Display
     console.print(f"\n[bold cyan]📦 Dependencies for {framework} + {orm} + {database}[/bold cyan]\n")
-    
+
     # Stats table
     stats_table = Table(show_header=False)
     stats_table.add_column("Category", style="cyan")
     stats_table.add_column("Count", style="green", justify="right")
-    
+
     stats_table.add_row("Total Dependencies", str(deps_info['total']))
     stats_table.add_row("Base", str(deps_info['base']))
     stats_table.add_row("Framework", str(deps_info['framework']))
@@ -234,13 +234,13 @@ def deps(framework, orm, database, auth):
     stats_table.add_row("Testing", str(deps_info['testing']))
     if auth:
         stats_table.add_row("Authentication", str(deps_info['auth']))
-    
+
     console.print(stats_table)
     console.print("\n[bold]Package List:[/bold]\n")
-    
+
     for dep in dependencies:
         console.print(f"  • {dep}")
-    
+
     console.print("\n")
 
 
@@ -250,17 +250,17 @@ def list_frameworks():
     List all available frameworks and ORMs
     """
     console.print("\n[bold cyan]📚 Available Frameworks and ORMs[/bold cyan]\n")
-    
+
     table = Table(show_header=True, header_style="bold magenta")
     table.add_column("Framework", style="cyan", width=15)
     table.add_column("Compatible ORMs", style="green")
     table.add_column("Async", justify="center", width=8)
-    
+
     for framework, framework_info in COMPATIBILITY_MATRIX.items():
         async_mark = "✅" if framework_info['async_support'] else "❌"
         orms = ", ".join(framework_info['compatible_orms'])
         table.add_row(framework, orms, async_mark)
-    
+
     console.print(table)
     console.print("\n")
 
@@ -270,16 +270,16 @@ def list_frameworks():
 def validate(project_path):
     """
     Validate an existing project structure
-    
+
     Examples:
         rdt validate ./my-api
     """
     project_path = Path(project_path)
-    
+
     console.print(f"\n[cyan]🔍 Validating project: {project_path.name}[/cyan]\n")
-    
+
     checks = []
-    
+
     # Check for required files
     required_files = [
         'requirements.txt',
@@ -287,28 +287,28 @@ def validate(project_path):
         '.gitignore',
         '.env.example',
     ]
-    
+
     for file in required_files:
         exists = (project_path / file).exists()
         status = "✅" if exists else "❌"
         checks.append((file, exists, status))
-    
+
     # Check for src directory
     src_exists = (project_path / 'src').exists()
     checks.append(('src/', src_exists, "✅" if src_exists else "❌"))
-    
+
     # Display results
     table = Table(show_header=True)
     table.add_column("Item", style="cyan")
     table.add_column("Status", justify="center")
-    
+
     for item, exists, status in checks:
         table.add_row(item, status)
-    
+
     console.print(table)
-    
+
     all_valid = all(exists for _, exists, _ in checks)
-    
+
     if all_valid:
         console.print("\n[green]✅ Project structure is valid![/green]\n")
     else:
@@ -327,7 +327,7 @@ def docs():
 def _init_git(project_path: Path):
     """Initialize git repository"""
     import subprocess
-    
+
     try:
         # Initialize git
         subprocess.run(
@@ -336,7 +336,7 @@ def _init_git(project_path: Path):
             check=True,
             capture_output=True
         )
-        
+
         # Initial commit
         subprocess.run(
             ['git', 'add', '.'],
@@ -344,16 +344,16 @@ def _init_git(project_path: Path):
             check=True,
             capture_output=True
         )
-        
+
         subprocess.run(
             ['git', 'commit', '-m', 'Initial commit from RDT'],
             cwd=project_path,
             check=True,
             capture_output=True
         )
-        
+
         console.print("[green]✅ Git repository initialized[/green]")
-        
+
     except subprocess.CalledProcessError:
         console.print("[yellow]⚠️  Git initialization failed (git may not be installed)[/yellow]")
     except FileNotFoundError:

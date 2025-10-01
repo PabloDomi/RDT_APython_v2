@@ -5,5 +5,5 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     database_url: str = "sqlite:///./{{ name }}.db"
-    
+
 settings = Settings()

@@ -90,7 +90,7 @@ def test_generated_project_structure(framework, orm, database):
 def test_generated_project_installs():
     """Test that dependencies can be installed"""
     temp_dir = Path(tempfile.mkdtemp())
-    
+
     try:
         config = ProjectConfig(
             name="install-test",

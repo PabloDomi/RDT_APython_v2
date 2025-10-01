@@ -23,11 +23,11 @@ class User(db.Model):
 
     def __repr__(self):
         return f'<User {self.username}>'
-    
+
     def set_password(self, password: str):
         """Hash and set password"""
         self.password_hash = PasswordValidator.hash_password(password)
-    
+
     def check_password(self, password: str) -> bool:
         """Verify password against hash"""
         return PasswordValidator.verify_password(password, self.password_hash)

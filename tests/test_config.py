@@ -22,7 +22,7 @@ def test_valid_config():
         database="PostgreSQL",
         auth_enabled=True,
     )
-    
+
     assert config.name == "my-api"
     assert config.framework == "Flask-Restx"
     assert config.orm == "SQLAlchemy"
@@ -56,7 +56,7 @@ def test_validate_combination():
     is_valid, msg = validate_combination("Flask-Restx", "SQLAlchemy")
     assert is_valid
     assert msg == ""
-    
+
     # Invalid combination
     is_valid, msg = validate_combination("Flask-Restx", "TortoiseORM")
     assert not is_valid
@@ -80,7 +80,7 @@ def test_quick_validate():
     )
     assert is_valid
     assert len(errors) == 0
-    
+
     # Invalid - no name
     is_valid, errors = quick_validate(
         "Flask-Restx", "SQLAlchemy", "PostgreSQL", ""
@@ -97,11 +97,11 @@ def test_config_methods():
         orm="SQLAlchemy",
         database="PostgreSQL",
     )
-    
+
     assert config.is_async_framework() is True
     assert config.get_port() == 8000
     assert config.get_python_version() == "3.11"
-    
+
     # Flask config
     config_flask = ProjectConfig(
         name="test-api",
@@ -109,6 +109,6 @@ def test_config_methods():
         orm="SQLAlchemy",
         database="PostgreSQL",
     )
-    
+
     assert config_flask.is_async_framework() is False
     assert config_flask.get_port() == 5300

@@ -10,7 +10,7 @@ from ..core.config import ProjectConfig, COMPATIBILITY_MATRIX
 def interactive_setup() -> ProjectConfig:
     """
     Interactive project setup
-    
+
     Returns:
         Validated ProjectConfig
     """
@@ -20,7 +20,7 @@ def interactive_setup() -> ProjectConfig:
         validate=EmptyInputValidator("Project name cannot be empty"),
         filter=lambda x: x.lower().strip()
     ).execute()
-    
+
     # Framework selection
     framework = inquirer.select(
         message="🎯 Select a framework:",
@@ -40,41 +40,41 @@ def interactive_setup() -> ProjectConfig:
         ],
         default="FastAPI"
     ).execute()
-    
+
     # Show framework info
     info = COMPATIBILITY_MATRIX[framework]
     compatible_orms = info['compatible_orms']
-    
+
     # ORM selection (based on framework compatibility)
     if framework == 'Django-Rest':
         orm = 'DjangoORM'
     else:
         orm_choices = []
-        
+
         if 'SQLAlchemy' in compatible_orms:
             orm_choices.append({
                 "name": "🗄️  SQLAlchemy - Most popular, mature, well-documented",
                 "value": "SQLAlchemy"
             })
-        
+
         if 'TortoiseORM' in compatible_orms:
             orm_choices.append({
                 "name": "🐢 TortoiseORM - Async ORM, Django-like API",
                 "value": "TortoiseORM"
             })
-        
+
         if 'Pewee' in compatible_orms:
             orm_choices.append({
                 "name": "🪶 Pewee - Lightweight, simple, easy to learn",
                 "value": "Pewee"
             })
-        
+
         orm = inquirer.select(
             message="💾 Select an ORM:",
             choices=orm_choices,
             default="SQLAlchemy"
         ).execute()
-    
+
     # Database selection
     database = inquirer.select(
         message="🗃️  Select database:",
@@ -94,31 +94,31 @@ def interactive_setup() -> ProjectConfig:
         ],
         default="PostgreSQL"
     ).execute()
-    
+
     # Authentication
     auth_enabled = inquirer.confirm(
         message="🔐 Include JWT authentication?",
         default=True
     ).execute()
-    
+
     # Docker support
     docker_support = inquirer.confirm(
         message="🐳 Include Docker configuration?",
         default=True
     ).execute()
-    
+
     # Testing suite
     testing_suite = inquirer.confirm(
         message="🧪 Include testing suite (pytest)?",
         default=True
     ).execute()
-    
+
     # Git initialization
     git_init = inquirer.confirm(
         message="📦 Initialize Git repository?",
         default=True
     ).execute()
-    
+
     # Create and return config
     return ProjectConfig(
         name=name,

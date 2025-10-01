@@ -15,7 +15,7 @@ Database = Literal["PostgreSQL", "MySQL", "SQLite"]
 class ProjectConfig(BaseModel):
     """
     Project configuration with automatic validation
-    
+
     Attributes:
         name: Project name (lowercase, alphanumeric with - and _)
         framework: Web framework to use
@@ -197,7 +197,7 @@ def get_framework_info(framework: Framework) -> dict:
 def validate_combination(framework: Framework, orm: ORM) -> tuple[bool, str]:
     """
     Validate if framework and ORM combination is valid
-    
+
     Returns:
         (is_valid, error_message)
     """
