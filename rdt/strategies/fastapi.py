@@ -39,10 +39,9 @@ class FastAPIStrategy(BaseStrategy):
         )
 
         # src/main.py (FastAPI app)
-        main_key = 'main_auth' if self.config.auth_enabled else 'main'
-        if main_key in templates:
+        if 'main' in templates:
             self.renderer.render_to_file(
-                templates[main_key],
+                templates['main'],
                 project_path / 'src' / 'main.py',
                 self.context
             )
@@ -72,10 +71,17 @@ class FastAPIStrategy(BaseStrategy):
             )
 
         # src/routes/routes_example.py
-        route_key = 'routes_auth' if self.config.auth_enabled else 'routes'
-        if route_key in templates:
+        if 'routes' in templates:
             self.renderer.render_to_file(
-                templates[route_key],
+                templates['routes'],
                 project_path / 'src' / 'api' / 'routes_example.py',
+                self.context
+            )
+
+        # src/schemas/schemas.py
+        if 'schemas' in templates:
+            self.renderer.render_to_file(
+                templates['schemas'],
+                project_path / 'src' / 'schemas' / 'schemas.py',
                 self.context
             )

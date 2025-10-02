@@ -41,12 +41,12 @@ class PasswordValidator:
         if not re.search(r"\d", password):
             errors.append("Password must contain at least one digit")
 
-        if not re.search(r"[!@#$%^&*(),.?":{}|<>]", password):
+        if not re.search(r'[!@#$%^&*()\-_=+\[\]{}|;,.<>?/~`\\]', password):
             errors.append("Password must contain at least one special character")
 
         return len(errors) == 0, errors
+{% if framework == 'Flask-Restx' %}
 
-    {% if framework == 'Flask-Restx' -%}
     @staticmethod
     def hash_password(password: str) -> str:
         """Hash password using werkzeug"""
@@ -56,7 +56,8 @@ class PasswordValidator:
     def verify_password(password: str, password_hash: str) -> bool:
         """Verify password against hash"""
         return check_password_hash(password_hash, password)
-    {% elif framework == 'FastAPI' -%}
+{% elif framework == 'FastAPI' %}
+
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
     @staticmethod
@@ -68,7 +69,7 @@ class PasswordValidator:
     def verify_password(plain_password: str, hashed_password: str) -> bool:
         """Verify password"""
         return PasswordValidator.pwd_context.verify(plain_password, hashed_password)
-    {% endif -%}
+{% endif %}
 
 
 class InputSanitizer:
@@ -97,8 +98,8 @@ class InputSanitizer:
 
         return username
 
+{% if framework == 'FastAPI' %}
 
-{% if framework == 'FastAPI' -%}
 security = HTTPBearer()
 
 

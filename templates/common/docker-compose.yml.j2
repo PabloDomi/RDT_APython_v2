@@ -7,29 +7,44 @@ services:
     ports:
       - "{{ port }}:{{ port }}"
     environment:
-      - DATABASE_URL=${DATABASE_URL}
-      {% if auth_enabled -%}
-      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
-      {% endif -%}
+{% if database == 'PostgreSQL' -%}
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/{{ name }}_db
+{% elif database == 'MySQL' -%}
+      - DATABASE_URL=mysql://root:password@db:3306/{{ name }}_db
+{% else -%}
+      - DATABASE_URL=sqlite:///app.db
+{% endif -%}
+{% if auth_enabled -%}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY:-dev-secret-key-change-in-production}
+{% endif -%}
       - ENVIRONMENT=${ENVIRONMENT:-development}
-    {% if database != 'SQLite' -%}
+      - DEBUG=False
+{% if database != 'SQLite' -%}
     depends_on:
       db:
         condition: service_healthy
-    {% endif -%}
+{% endif -%}
     volumes:
       - .:/app
     networks:
       - app-network
     restart: unless-stopped
-
-  {% if database == 'PostgreSQL' -%}
+{% if framework == 'Flask-Restx' -%}
+    command: >
+      sh -c "
+        flask db init || echo 'DB already initialized' &&
+        flask db migrate -m 'Auto migration' || echo 'No changes to migrate' &&
+        flask db upgrade &&
+        gunicorn --bind 0.0.0.0:{{ port }} --workers 4 app:app
+      "
+{% endif -%}
+{% if database == 'PostgreSQL' -%}
   db:
     image: postgres:15-alpine
     container_name: {{ name }}_db
     environment:
-      POSTGRES_USER: ${PGUSER:-postgres}
-      POSTGRES_PASSWORD: ${PGPASSWORD:-postgres}
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
       POSTGRES_DB: {{ name }}_db
     ports:
       - "5432:5432"
@@ -38,12 +53,12 @@ services:
     networks:
       - app-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${PGUSER:-postgres}"]
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
       timeout: 5s
       retries: 5
     restart: unless-stopped
-  {% elif database == 'MySQL' -%}
+{% elif database == 'MySQL' -%}
   db:
     image: mysql:8.0
     container_name: {{ name }}_db
@@ -64,7 +79,7 @@ services:
       timeout: 5s
       retries: 5
     restart: unless-stopped
-  {% endif -%}
+{% endif -%}
 
   redis:
     image: redis:7-alpine
@@ -86,9 +101,9 @@ networks:
 
 {% if database != 'SQLite' -%}
 volumes:
-  {% if database == 'PostgreSQL' -%}
+{% if database == 'PostgreSQL' -%}
   postgres_data:
-  {% elif database == 'MySQL' -%}
+{% elif database == 'MySQL' -%}
   mysql_data:
-  {% endif -%}
+{% endif -%}
 {% endif -%}

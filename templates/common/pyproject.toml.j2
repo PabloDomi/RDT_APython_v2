@@ -26,6 +26,14 @@ target-version = ["py{{ python_version | replace('.', '') }}"]
 line-length = 100
 select = ["E", "F", "W", "I"]
 
+{% if orm == 'TortoiseORM' -%}
+[tool.aerich]
+tortoise_orm = "src.database.TORTOISE_ORM"
+location = "./migrations"
+src_folder = "./src"
+
+{% endif -%}
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = "test_*.py"

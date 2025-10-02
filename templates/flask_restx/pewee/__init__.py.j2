@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from flask import Flask
 from src.config.config import Config
 from src.extensions import api, db{% if auth_enabled %}, jwt{% endif %}
+
 from src.models.models import User
 from src.routes.routes_example import user_ns
 
@@ -31,6 +32,12 @@ def create_app():
     # Register namespaces
     api.add_namespace(user_ns)
     
+    # Health check endpoint
+    @app.route('/health')
+    def health_check():
+        """Health check endpoint for Docker"""
+        return {'status': 'healthy', 'message': 'Application is running'}, 200
+    
     # Create tables
     with app.app_context():
         db.database.create_tables([User])
@@ -43,7 +50,7 @@ def create_app():
 @jwt.user_identity_loader
 def user_identity_lookup(user):
     """Store user ID in token 'sub' field"""
-    return user.id
+    return str(user.id)
 
 
 @jwt.user_lookup_loader
@@ -51,7 +58,7 @@ def user_lookup_callback(_jwt_header, jwt_data):
     """Load user from token 'sub' field"""
     identity = jwt_data["sub"]
     try:
-        return User.get_by_id(identity)
+        return User.get_by_id(int(identity))
     except User.DoesNotExist:
         return None
 {% endif %}

@@ -48,13 +48,15 @@ class DependencyManager:
                 "fastapi>=0.109.0",
                 "uvicorn[standard]>=0.27.0",
                 "python-multipart>=0.0.6",  # For form data
+                "email-validator>=2.1.0",
             ],
             'auth': [
                 "python-jose[cryptography]>=3.3.0",
                 "passlib[bcrypt]>=1.7.4",
+                "python-multipart>=0.0.6",
             ],
             'production': [
-                "uvicorn[standard]>=0.27.0",
+                "gunicorn>=21.2.0",
             ],
         },
         'Django-Rest': {
@@ -88,14 +90,22 @@ class DependencyManager:
                 "sqlalchemy[asyncio]>=2.0.0",
                 "alembic>=1.13.0",
             ],
+            'drivers': {
+                'PostgreSQL': ["asyncpg>=0.29.0"],
+                'MySQL': ["aiomysql>=0.2.0"],
+                'SQLite': ["aiosqlite>=0.19.0"],
+            }
         },
         'TortoiseORM': {
             'base': [
                 "tortoise-orm>=0.20.0",
+                "aerich>=0.7.2",  # Migrations tool
             ],
-            'FastAPI': [
-                "aerich>=0.7.0",  # Migrations for Tortoise
-            ],
+            'drivers': {
+                'PostgreSQL': ["asyncpg>=0.29.0"],
+                'MySQL': ["aiomysql>=0.2.0"],
+                'SQLite': ["aiosqlite>=0.19.0"],
+            },
         },
         'Pewee': {
             'base': [

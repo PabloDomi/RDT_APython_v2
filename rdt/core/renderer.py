@@ -231,20 +231,19 @@ class TemplateRegistry:
         'FastAPI': {
             'SQLAlchemy': {
                 'main': 'fastapi/sqlalchemy/main.py.j2',
-                'main_auth': 'fastapi/sqlalchemy/main_auth.py.j2',
                 'database': 'fastapi/sqlalchemy/database.py.j2',
                 'models': 'fastapi/sqlalchemy/models.py.j2',
                 'routes': 'fastapi/sqlalchemy/routes.py.j2',
-                'routes_auth': 'fastapi/sqlalchemy/routes_auth.py.j2',
                 'config': 'fastapi/sqlalchemy/config.py.j2',
+                'schemas': 'fastapi/sqlalchemy/schemas.py.j2',
             },
             'TortoiseORM': {
                 'main': 'fastapi/tortoise/main.py.j2',
-                'main_auth': 'fastapi/tortoise/main_auth.py.j2',
+                'database': 'fastapi/tortoise/database.py.j2',
                 'models': 'fastapi/tortoise/models.py.j2',
                 'routes': 'fastapi/tortoise/routes.py.j2',
-                'routes_auth': 'fastapi/tortoise/routes_auth.py.j2',
                 'config': 'fastapi/tortoise/config.py.j2',
+                'schemas': 'fastapi/tortoise/schemas.py.j2',
             },
         },
         'Django-Rest': {
@@ -272,7 +271,6 @@ class TemplateRegistry:
         'security': 'common/security.py.j2',
         'pytest_ini': 'common/pytest.ini.j2',
         'pyproject_toml': 'common/pyproject.toml.j2',
-        'config': 'common/config.py.j2',
         'License': 'common/LICENSE.j2'
     }
 
