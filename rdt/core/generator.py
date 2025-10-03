@@ -87,10 +87,6 @@ class ProjectGenerator:
             # Generate dependencies
             self._generate_dependencies(project_path, config)
 
-            # Generate tests if enabled
-            if config.testing_suite:
-                self._generate_tests(project_path, config)
-
             # Generate Docker if enabled
             if config.docker_support:
                 self._generate_docker_files(project_path, config)
@@ -179,50 +175,6 @@ class ProjectGenerator:
         # requirements-dev.txt
         DependencyManager.write_requirements_dev_txt(project_path)
 
-    def _generate_tests(
-        self,
-        project_path: Path,
-        config: ProjectConfig,
-    ):
-        """Generate test files"""
-        context = config.model_dump_safe()
-        tests_dir = project_path / 'tests'
-
-        # conftest.py
-        self.renderer.render_to_file(
-            TemplateRegistry.TEST_TEMPLATES['conftest'],
-            tests_dir / 'conftest.py',
-            context
-        )
-
-        # test_api.py
-        self.renderer.render_to_file(
-            TemplateRegistry.TEST_TEMPLATES['test_api'],
-            tests_dir / 'test_api.py',
-            context
-        )
-
-        # test_models.py
-        self.renderer.render_to_file(
-            TemplateRegistry.TEST_TEMPLATES['test_models'],
-            tests_dir / 'test_models.py',
-            context
-        )
-
-        # test_security.py (if auth enabled)
-        if config.auth_enabled:
-            self.renderer.render_to_file(
-                TemplateRegistry.TEST_TEMPLATES['test_security'],
-                tests_dir / 'test_security.py',
-                context
-            )
-
-        # pytest.ini
-        self.renderer.render_to_file(
-            TemplateRegistry.COMMON_TEMPLATES['pytest_ini'],
-            project_path / 'pytest.ini',
-            context
-        )
 
     def _generate_docker_files(self, project_path: Path, config: ProjectConfig):
         """Generate Docker configuration"""

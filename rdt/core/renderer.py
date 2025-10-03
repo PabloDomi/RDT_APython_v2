@@ -276,10 +276,42 @@ class TemplateRegistry:
 
     # Test templates
     TEST_TEMPLATES = {
-        'conftest': 'tests/conftest.py.j2',
-        'test_api': 'tests/test_api.py.j2',
-        'test_models': 'tests/test_models.py.j2',
-        'test_security': 'tests/test_security.py.j2',
+        'Flask-Restx': {
+            'SQLAlchemy': {
+                'conftest': 'flask_restx/sqlalchemy/conftest.py.j2',
+                'test_api': 'flask_restx/sqlalchemy/test_api.py.j2',
+                'test_models': 'flask_restx/sqlalchemy/test_models.py.j2',
+                'test_security': 'common/test_security.py.j2',  # Común
+            },
+            'Pewee': {
+                'conftest': 'flask_restx/pewee/conftest.py.j2',
+                'test_api': 'flask_restx/pewee/test_api.py.j2',
+                'test_models': 'flask_restx/pewee/test_models.py.j2',
+                'test_security': 'common/test_security.py.j2',
+            },
+        },
+        'FastAPI': {
+            'SQLAlchemy': {
+                'conftest': 'fastapi/sqlalchemy/conftest.py.j2',
+                'test_api': 'fastapi/sqlalchemy/test_api.py.j2',
+                'test_models': 'fastapi/sqlalchemy/test_models.py.j2',
+                'test_security': 'common/test_security.py.j2',
+            },
+            'TortoiseORM': {
+                'conftest': 'fastapi/tortoise/conftest.py.j2',
+                'test_api': 'fastapi/tortoise/test_api.py.j2',
+                'test_models': 'fastapi/tortoise/test_models.py.j2',
+                'test_security': 'common/test_security.py.j2',
+            },
+        },
+        'Django-Rest': {
+            'DjangoORM': {
+                'conftest': 'django_rest/conftest.py.j2',
+                'test_api': 'django_rest/test_api.py.j2',
+                'test_models': 'django_rest/test_models.py.j2',
+                'test_security': 'common/test_security.py.j2',
+            },
+        },
     }
 
     @classmethod
@@ -307,24 +339,15 @@ class TemplateRegistry:
         # Framework-specific templates
         framework_templates = cls.TEMPLATES.get(framework, {}).get(orm, {})
 
-        for name, path in framework_templates.items():
-            # Skip auth templates if auth not enabled
-            if '_auth' in name and not auth_enabled:
-                continue
-            # Skip non-auth templates if auth is enabled and auth version exists
-            if auth_enabled and not name.endswith('_auth'):
-                auth_version = f"{name}_auth"
-                if auth_version in framework_templates:
-                    continue
-
-            templates[name] = path
+        templates.update(framework_templates)
 
         # Common templates
         templates.update(cls.COMMON_TEMPLATES)
 
         # Test templates
         if testing_suite:
-            templates.update(cls.TEST_TEMPLATES)
+            test_templates = cls.TEST_TEMPLATES.get(framework, {}).get(orm, {})
+            templates.update(test_templates)
 
         return templates
 

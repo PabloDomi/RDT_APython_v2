@@ -78,12 +78,14 @@ class InputSanitizer:
     @staticmethod
     def sanitize_email(email: str) -> str:
         """Validate and sanitize email"""
+        email = email.strip()
+
         email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
 
         if not re.match(email_pattern, email):
             raise ValueError("Invalid email format")
 
-        return email.lower().strip()
+        return email.lower()
 
     @staticmethod
     def sanitize_username(username: str) -> str:

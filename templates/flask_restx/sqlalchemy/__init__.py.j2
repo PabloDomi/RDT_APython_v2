@@ -13,7 +13,7 @@ from .extensions import api, db, migration{% if auth_enabled %}, jwt{% endif %}
 
 
 
-def create_app():
+def create_app(config_name=None):
     """Application factory pattern"""
     load_dotenv()
 
