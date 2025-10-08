@@ -34,33 +34,50 @@ class TestUserModel:
         assert user.check_password('MyPassword123!')
         assert not user.check_password('WrongPassword')
     
-    def test_unique_username(self, db, test_user):
+    def test_unique_username(self, db):
         """Test username uniqueness constraint"""
-        duplicate_user = User(username='testuser', email='different@example.com')
-        duplicate_user.set_password('Password123!')
+        # Create first user
+        user1 = User(username='uniquetest', email='unique1@example.com')
+        user1.set_password('Password123!')
+        db.session.add(user1)
+        db.session.commit()
         
-        db.session.add(duplicate_user)
+        # Try to create duplicate username
+        user2 = User(username='uniquetest', email='unique2@example.com')
+        user2.set_password('Password123!')
+        db.session.add(user2)
         
         with pytest.raises(Exception):
             db.session.commit()
     
-    def test_unique_email(self, db, test_user):
+    def test_unique_email(self, db):
         """Test email uniqueness constraint"""
-        duplicate_user = User(username='different', email='test@example.com')
-        duplicate_user.set_password('Password123!')
+        # Create first user
+        user1 = User(username='unique1', email='uniqueemail@example.com')
+        user1.set_password('Password123!')
+        db.session.add(user1)
+        db.session.commit()
         
-        db.session.add(duplicate_user)
+        # Try to create duplicate email
+        user2 = User(username='unique2', email='uniqueemail@example.com')
+        user2.set_password('Password123!')
+        db.session.add(user2)
         
         with pytest.raises(Exception):
             db.session.commit()
     
-    def test_user_to_dict(self, test_user):
+    def test_user_to_dict(self, db):
         """Test user serialization"""
-        user_dict = test_user.to_dict()
+        user = User(username='dictuser', email='dict@example.com')
+        user.set_password('Password123!')
+        db.session.add(user)
+        db.session.commit()
+        
+        user_dict = user.to_dict()
         
         assert 'id' in user_dict
-        assert user_dict['username'] == 'testuser'
-        assert user_dict['email'] == 'test@example.com'
+        assert user_dict['username'] == 'dictuser'
+        assert user_dict['email'] == 'dict@example.com'
         assert 'password_hash' not in user_dict
         assert 'password' not in user_dict
 
@@ -68,12 +85,19 @@ class TestUserModel:
 class TestItemModel:
     """Test Item model"""
     
-    def test_create_item(self, db, test_user):
+    def test_create_item(self, db):
         """Test creating an item"""
+        # First create a user
+        user = User(username='itemowner', email='owner@example.com')
+        user.set_password('Password123!')
+        db.session.add(user)
+        db.session.commit()
+        
+        # Now create the item
         item = Item(
             title='Test Item',
             description='Test description',
-            owner_id=test_user.id
+            owner_id=user.id
         )
         
         db.session.add(item)
@@ -81,14 +105,21 @@ class TestItemModel:
         
         assert item.id is not None
         assert item.title == 'Test Item'
-        assert item.owner_id == test_user.id
+        assert item.owner_id == user.id
     
-    def test_item_to_dict(self, db, test_user):
+    def test_item_to_dict(self, db):
         """Test item serialization"""
+        # First create a user
+        user = User(username='itemserialize', email='serialize@example.com')
+        user.set_password('Password123!')
+        db.session.add(user)
+        db.session.commit()
+        
+        # Now create the item
         item = Item(
             title='Serialization Test',
             description='Testing to_dict',
-            owner_id=test_user.id
+            owner_id=user.id
         )
         db.session.add(item)
         db.session.commit()
@@ -97,7 +128,7 @@ class TestItemModel:
         
         assert 'id' in item_dict
         assert item_dict['title'] == 'Serialization Test'
-        assert item_dict['owner_id'] == test_user.id
+        assert item_dict['owner_id'] == user.id
 
 {% else %}
 

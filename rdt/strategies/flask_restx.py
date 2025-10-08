@@ -100,6 +100,14 @@ class FlaskRestxStrategy(BaseStrategy):
             print(f"Warning: No test templates found for {self.config.framework} + {self.config.orm}")
             return
 
+        #tests/.env.test.example
+        if '.env_test' in test_templates:
+            self.renderer.render_to_file(
+                test_templates['.env_test'],
+                project_path / 'tests' / '.env.test.example',
+                self.context
+            )
+
         # tests/conftest.py
         if 'conftest' in test_templates:
             self.renderer.render_to_file(
@@ -129,5 +137,13 @@ class FlaskRestxStrategy(BaseStrategy):
             self.renderer.render_to_file(
                 test_templates['test_security'],
                 project_path / 'tests' / 'test_security.py',
+                self.context
+            )
+
+        # tests/pytest.ini
+        if 'pytest_ini' in test_templates:
+            self.renderer.render_to_file(
+                test_templates['pytest_ini'],
+                project_path / 'tests' / 'pytest.ini',
                 self.context
             )

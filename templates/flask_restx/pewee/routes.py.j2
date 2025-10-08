@@ -8,7 +8,11 @@ from flask_restx import Resource, Namespace, fields
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 {% endif -%}
 from src.models.models import User
-from src.extensions import db
+from src.security import PasswordValidator, InputSanitizer
+from peewee import IntegrityError, DoesNotExist
+
+password_validator = PasswordValidator()
+input_sanitizer = InputSanitizer()
 
 {% if auth_enabled -%}
 # Authorization configuration
@@ -59,14 +63,30 @@ class Register(Resource):
         
         if User.select().where(User.email == data['email']).exists():
             user_ns.abort(400, 'Email exists')
+
+        try:
+            username = input_sanitizer.sanitize_username(data['username'])
+        except ValueError as e:
+            user_ns.abort(400, f'Invalid username: {str(e)}')
+
+        try:
+            email = input_sanitizer.sanitize_email(data['email'])
+        except ValueError as e:
+            user_ns.abort(400, f'Invalid email: {str(e)}')
+
+        is_valid, message = password_validator.validate(data['password'])
+        if not is_valid:
+            user_ns.abort(400, f'Invalid password: {message}')
         
-        # Create user
-        user = User.create(
-            username=data['username'],
-            email=data['email']
-        )
-        user.set_password(data['password'])
-        user.save()
+        try:
+            # Create user with password
+            user = User.create_user(
+                username=username,
+                email=email,
+                password=data['password']
+            )
+        except IntegrityError as e:
+            user_ns.abort(400, f'Database error: {str(e)}')
         
         return user.to_dict(), 201
 
@@ -80,7 +100,7 @@ class Login(Resource):
         
         try:
             user = User.get(User.username == data['username'])
-        except User.DoesNotExist:
+        except DoesNotExist:
             user_ns.abort(401, 'Invalid credentials')
         
         if not user.check_password(data['password']):
@@ -101,7 +121,7 @@ class CurrentUser(Resource):
         try:
             user = User.get_by_id(user_id)
             return user.to_dict()
-        except User.DoesNotExist:
+        except DoesNotExist:
             user_ns.abort(404, 'User not found')
 {% else -%}
 
@@ -140,6 +160,6 @@ class UserItem(Resource):
         try:
             user = User.get_by_id(user_id)
             return user.to_dict()
-        except User.DoesNotExist:
+        except DoesNotExist:
             user_ns.abort(404, 'User not found')
 {% endif -%}

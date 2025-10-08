@@ -278,38 +278,48 @@ class TemplateRegistry:
     TEST_TEMPLATES = {
         'Flask-Restx': {
             'SQLAlchemy': {
+                'pytest_ini': 'flask_restx/sqlalchemy/pytest.ini.j2',
                 'conftest': 'flask_restx/sqlalchemy/conftest.py.j2',
                 'test_api': 'flask_restx/sqlalchemy/test_api.py.j2',
                 'test_models': 'flask_restx/sqlalchemy/test_models.py.j2',
-                'test_security': 'common/test_security.py.j2',  # Común
+                'test_security': 'common/test_security.py.j2',
+                '.env_test': 'flask_restx/sqlalchemy/.env.test.example.j2',
             },
             'Pewee': {
+                'pytest_ini': 'flask_restx/sqlalchemy/pytest.ini.j2',
                 'conftest': 'flask_restx/pewee/conftest.py.j2',
                 'test_api': 'flask_restx/pewee/test_api.py.j2',
                 'test_models': 'flask_restx/pewee/test_models.py.j2',
                 'test_security': 'common/test_security.py.j2',
+                '.env_test': 'flask_restx/sqlalchemy/.env.test.example.j2',
             },
         },
         'FastAPI': {
             'SQLAlchemy': {
+                'pytest_ini': 'flask_restx/sqlalchemy/pytest.ini.j2',
                 'conftest': 'fastapi/sqlalchemy/conftest.py.j2',
                 'test_api': 'fastapi/sqlalchemy/test_api.py.j2',
                 'test_models': 'fastapi/sqlalchemy/test_models.py.j2',
                 'test_security': 'common/test_security.py.j2',
+                '.env_test': 'flask_restx/sqlalchemy/.env.test.example.j2',
             },
             'TortoiseORM': {
+                'pytest_ini': 'flask_restx/sqlalchemy/pytest.ini.j2',
                 'conftest': 'fastapi/tortoise/conftest.py.j2',
                 'test_api': 'fastapi/tortoise/test_api.py.j2',
                 'test_models': 'fastapi/tortoise/test_models.py.j2',
                 'test_security': 'common/test_security.py.j2',
+                '.env_test': 'flask_restx/sqlalchemy/.env.test.example.j2',
             },
         },
         'Django-Rest': {
             'DjangoORM': {
+                'pytest_ini': 'flask_restx/sqlalchemy/pytest.ini.j2',
                 'conftest': 'django_rest/conftest.py.j2',
                 'test_api': 'django_rest/test_api.py.j2',
                 'test_models': 'django_rest/test_models.py.j2',
                 'test_security': 'common/test_security.py.j2',
+                '.env_test': 'flask_restx/sqlalchemy/.env.test.example.j2',
             },
         },
     }

@@ -7,8 +7,12 @@ from flask import Flask
 from src.config.config import Config
 from src.extensions import api, db{% if auth_enabled %}, jwt{% endif %}
 
-from src.models.models import User
+from src.models.models import User, Item
 from src.routes.routes_example import user_ns
+
+from peewee import DoesNotExist
+from peewee import PostgresqlDatabase, MySQLDatabase
+from peewee import SqliteDatabase
 
 
 def create_app():
@@ -19,7 +23,31 @@ def create_app():
     app.config.from_object(Config)
 
     # Initialize Peewee database
-    db.init_app(app)
+    db_config = app.config['DATABASE']
+
+    # For SQLite, only database name is needed
+    if db_config['engine'] == 'peewee.SqliteDatabase':
+        database = SqliteDatabase(db_config['name'])
+        db.initialize(database)
+    else:
+        # For other databases, use full config
+        if 'postgres' in db_config['engine'].lower():
+            database = PostgresqlDatabase(
+                db_config['name'],
+                user=db_config.get('user'),
+                password=db_config.get('password'),
+                host=db_config.get('host'),
+                port=db_config.get('port')
+            )
+        else:
+            database = MySQLDatabase(
+                db_config['name'],
+                user=db_config.get('user'),
+                password=db_config.get('password'),
+                host=db_config.get('host'),
+                port=db_config.get('port')
+            )
+        db.initialize(database)
     
     # Initialize Flask-Restx
     api.init_app(app)
@@ -40,7 +68,18 @@ def create_app():
     
     # Create tables
     with app.app_context():
-        db.database.create_tables([User])
+        db.obj.create_tables([User, Item], safe=True)
+
+    @app.before_request
+    def before_request():
+        if db.obj.is_closed():
+            db.obj.connect()
+
+    @app.after_request
+    def after_request(response):
+        if not db.obj.is_closed():
+            db.obj.close()
+        return response
 
     return app
 
@@ -50,7 +89,7 @@ def create_app():
 @jwt.user_identity_loader
 def user_identity_lookup(user):
     """Store user ID in token 'sub' field"""
-    return str(user.id)
+    return str(user)
 
 
 @jwt.user_lookup_loader
@@ -59,6 +98,6 @@ def user_lookup_callback(_jwt_header, jwt_data):
     identity = jwt_data["sub"]
     try:
         return User.get_by_id(int(identity))
-    except User.DoesNotExist:
+    except DoesNotExist:
         return None
 {% endif %}

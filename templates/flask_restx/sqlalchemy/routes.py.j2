@@ -87,7 +87,7 @@ class CurrentUser(Resource):
     def get(self):
         """Get current user"""
         current_user = get_jwt_identity()
-        user = User.query.get(current_user)
+        user = db.session.get(User, current_user)
         return user if user else user_ns.abort(404, 'Not found')
 {% else -%}
 
