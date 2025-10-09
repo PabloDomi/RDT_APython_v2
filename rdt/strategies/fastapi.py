@@ -4,6 +4,7 @@ Strategy for FastAPI projects
 from pathlib import Path
 from rdt.strategies.base import BaseStrategy
 from rdt.core.renderer import TemplateRegistry
+from rdt.core.alembic_setup import AlembicConfigurator
 
 
 class FastAPIStrategy(BaseStrategy):
@@ -21,13 +22,20 @@ class FastAPIStrategy(BaseStrategy):
             'src/api',
             'src/schemas',
             'src/crud',
-            'alembic',
+            'src/config',
+            'src/models',
         ]
 
         for dir_name in dirs:
             (project_path / dir_name).mkdir(parents=True, exist_ok=True)
             if dir_name.startswith('src/'):
                 (project_path / dir_name / '__init__.py').touch()
+
+        # Tests directory
+        if self.config.testing_suite:
+            tests_dir = project_path / 'tests'
+            tests_dir.mkdir(exist_ok=True)
+            (tests_dir / '__init__.py').touch()
 
     def generate_files(self, project_path: Path):
         """Generate FastAPI specific files"""
@@ -70,7 +78,7 @@ class FastAPIStrategy(BaseStrategy):
                 self.context
             )
 
-        # src/api/routes_example.py
+        # src/api/routes.py
         if 'routes' in templates:
             self.renderer.render_to_file(
                 templates['routes'],
@@ -98,6 +106,10 @@ class FastAPIStrategy(BaseStrategy):
         if self.config.testing_suite:
             self._generate_tests(project_path)
 
+        # 🔧 Configure Alembic automatically for SQLAlchemy
+        if self.config.orm == 'SQLAlchemy':
+            self._setup_alembic(project_path)
+
     def _generate_tests(self, project_path: Path):
         """Generate test files specific to FastAPI + ORM"""
         # Obtener templates de tests específicos
@@ -106,7 +118,7 @@ class FastAPIStrategy(BaseStrategy):
         ).get(self.config.orm, {})
 
         if not test_templates:
-            print(f"Warning: No test templates found for {self.config.framework} + {self.config.orm}")
+            print(f"⚠️  Warning: No test templates found for {self.config.framework} + {self.config.orm}")
             return
 
         # tests/conftest.py
@@ -140,3 +152,43 @@ class FastAPIStrategy(BaseStrategy):
                 project_path / 'tests' / 'test_security.py',
                 self.context
             )
+
+        # .env.test.example
+        if '.env_test' in test_templates:
+            self.renderer.render_to_file(
+                test_templates['.env_test'],
+                project_path / 'tests' / '.env.test.example',
+                self.context
+            )
+        
+        # tests/pytest.ini
+        if 'pytest_ini' in test_templates:
+            self.renderer.render_to_file(
+                test_templates['pytest_ini'],
+                project_path / 'tests' / 'pytest.ini',
+                self.context
+            )
+
+    def _setup_alembic(self, project_path: Path):
+        """
+        Setup and configure Alembic automatically for SQLAlchemy projects
+        This runs after all files are generated
+        """
+        print("\n🔧 Configuring Alembic for database migrations...")
+
+        # Try to run alembic init and configure
+        success = AlembicConfigurator.setup_alembic(
+            project_path=project_path,
+            project_name=self.config.name,
+            module_name="src"
+        )
+
+        if not success:
+            # Fallback: create structure manually if alembic command not available
+            print("  📦 Creating Alembic structure manually (alembic not installed yet)...")
+            AlembicConfigurator.create_alembic_structure_manually(
+                project_path=project_path,
+                project_name=self.config.name,
+                module_name="src"
+            )
+            print("  ✅ Alembic structure created. It will be fully configured after installing dependencies.")

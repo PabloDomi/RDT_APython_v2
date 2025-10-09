@@ -36,7 +36,8 @@ class DependencyManager:
             ],
             'auth': [
                 "flask-jwt-extended>=4.5.0",
-                "passlib[bcrypt]>=1.7.4",
+                "passlib[bcrypt]==1.7.4",
+                "bcrypt==4.0.1",
             ],
             'production': [
                 "gunicorn>=21.2.0",
@@ -52,7 +53,8 @@ class DependencyManager:
             ],
             'auth': [
                 "python-jose[cryptography]>=3.3.0",
-                "passlib[bcrypt]>=1.7.4",
+                "passlib[bcrypt]==1.7.4",
+                "bcrypt==4.0.1",
                 "python-multipart>=0.0.6",
             ],
             'production': [

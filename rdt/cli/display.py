@@ -155,7 +155,6 @@ flask db upgrade
 """
     elif config.orm == 'SQLAlchemy' and config.framework == 'FastAPI':
         steps += """```bash
-alembic init alembic
 alembic revision --autogenerate -m "Initial migration"
 alembic upgrade head
 ```

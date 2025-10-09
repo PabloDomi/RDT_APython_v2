@@ -9,11 +9,15 @@ services:
       - "{{ port }}:{{ port }}"
     environment:
 {% if database == 'PostgreSQL' -%}
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/{{ name }}_db
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@db:5432/{{ name }}_db
 {% elif database == 'MySQL' -%}
-      - DATABASE_URL=mysql://root:password@db:3306/{{ name }}_db
+      - DATABASE_URL=mysql+aiomysql://root:password@db:3306/{{ name }}_db
+{% else -%}
+{% if framework == 'FastAPI' -%}
+      - DATABASE_URL=sqlite+aiosqlite:///app.db
 {% else -%}
       - DATABASE_URL=sqlite:///app.db
+{% endif -%}
 {% endif -%}
 {% if auth_enabled -%}
       - JWT_SECRET_KEY=${JWT_SECRET_KEY:-dev-secret-key-change-in-production}
@@ -34,18 +38,39 @@ services:
 {% if orm == 'SQLAlchemy' -%}
     command: >
       sh -c "
-        flask db init || echo 'DB already initialized' &&
-        flask db migrate -m 'Auto migration' || echo 'No changes to migrate' &&
         flask db upgrade &&
+        echo 'Starting Flask application with {{ orm }}...' &&
         gunicorn --bind 0.0.0.0:{{ port }} --workers 4 app:app
       "
-{% else -%}
+{% elif orm == 'Peewee' -%}
     command: >
       sh -c "
         echo 'Starting Flask application with {{ orm }}...' &&
         gunicorn --bind 0.0.0.0:{{ port }} --workers 4 app:app
       "
 {% endif -%}
+{% elif framework == 'FastAPI' -%}
+{% if orm == 'SQLAlchemy' -%}
+    command: >
+      sh -c "
+        echo 'Running database migrations...' &&
+        alembic upgrade head &&
+        echo 'Starting FastAPI application with {{ orm }}...' &&
+        uvicorn src.main:app --host 0.0.0.0 --port {{ port }} --reload
+      "
+{% else -%}
+    command: >
+      sh -c "
+        echo 'Starting FastAPI application with {{ orm }}...' &&
+        uvicorn src.main:app --host 0.0.0.0 --port {{ port }} --reload
+      "
+{% endif -%}
+{% else -%}
+    command: >
+      sh -c "
+        echo 'Starting Flask application with {{ orm }}...' &&
+        gunicorn --bind 0.0.0.0:{{ port }} --workers 4 app:app
+      "
 {% endif -%}
 
 {% if database == 'PostgreSQL' -%}
