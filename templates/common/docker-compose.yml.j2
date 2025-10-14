@@ -13,10 +13,10 @@ services:
 {% elif database == 'MySQL' -%}
       - DATABASE_URL=mysql+aiomysql://root:password@db:3306/{{ name }}_db
 {% else -%}
-{% if framework == 'FastAPI' -%}
+{% if framework == 'FastAPI' and orm == 'SQLAlchemy' -%}
       - DATABASE_URL=sqlite+aiosqlite:///app.db
 {% else -%}
-      - DATABASE_URL=sqlite:///app.db
+      - DATABASE_URL=sqlite://./app.db
 {% endif -%}
 {% endif -%}
 {% if auth_enabled -%}
@@ -61,6 +61,9 @@ services:
 {% else -%}
     command: >
       sh -c "
+        echo 'Running database migrations...' &&
+        aerich init -t src.config.config.TORTOISE_ORM &&
+        aerich init-db &&
         echo 'Starting FastAPI application with {{ orm }}...' &&
         uvicorn src.main:app --host 0.0.0.0 --port {{ port }} --reload
       "

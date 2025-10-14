@@ -102,6 +102,7 @@ class DependencyManager:
             'base': [
                 "tortoise-orm>=0.20.0",
                 "aerich>=0.7.2",  # Migrations tool
+                "tomlkit>=0.11.6",
             ],
             'drivers': {
                 'PostgreSQL': ["asyncpg>=0.29.0"],
