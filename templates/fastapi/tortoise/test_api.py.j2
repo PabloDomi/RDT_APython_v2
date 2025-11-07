@@ -25,7 +25,7 @@ class TestHealthEndpoints:
         assert data["status"] == "healthy"
 
 
-{% if auth_enabled -%}
+{% if auth_enabled %}
 class TestAuthenticationEndpoints:
     """Test authentication endpoints"""
     
@@ -180,7 +180,7 @@ class TestUserEndpoints:
         assert response.status_code == 404
 
 
-{% endif -%}
+{% endif %}
 class TestItemEndpoints:
     """Test item management endpoints"""
     
@@ -199,11 +199,11 @@ class TestItemEndpoints:
         assert data["description"] == item_data["description"]
         assert "id" in data
 
-{% if auth_enabled -%}
+{% if auth_enabled %}
         assert "owner_id" in data
-{% endif -%}
+{% endif %}
     
-{% if auth_enabled -%}
+{% if auth_enabled %}
     async def test_create_item_unauthorized(self, client: AsyncClient):
         """Test creating item without authentication fails"""
         item_data = {
@@ -213,7 +213,7 @@ class TestItemEndpoints:
         
         response = await client.post("/api/items", json=item_data)
         assert response.status_code == 401  
-{% endif -%}
+{% endif %}
 
     async def test_list_user_items(self, client: AsyncClient{% if auth_enabled %}, auth_headers: dict{% endif %}, test_item):
         """Test listing items{% if auth_enabled %} owned by current user{% endif %}"""
@@ -275,7 +275,7 @@ class TestItemEndpoints:
 class TestPagination:
     """Test pagination parameters"""
     
-{% if auth_enabled -%}
+{% if auth_enabled %}
     async def test_list_users_with_pagination(self, client: AsyncClient, auth_headers: dict):
         """Test pagination parameters work correctly"""
         response = await client.get("/api/users?skip=0&limit=10", headers=auth_headers)
@@ -284,7 +284,7 @@ class TestPagination:
         data = response.json()
         assert isinstance(data, list)
         assert len(data) <= 10
-{% endif -%}
+{% endif %}
 
     async def test_list_items_with_pagination(self, client: AsyncClient{% if auth_enabled %}, auth_headers: dict{% endif %}):
         """Test pagination for items"""

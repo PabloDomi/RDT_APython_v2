@@ -72,18 +72,17 @@ class FlaskRestxStrategy(BaseStrategy):
 
         # app.py (entry point)
         self.renderer.render_to_file(
-            TemplateRegistry.COMMON_TEMPLATES['app'],
+            templates['app'],
             project_path / 'app.py',
             self.context
         )
 
         # Security (if auth enabled)
-        if self.config.auth_enabled:
-            self.renderer.render_to_file(
-                TemplateRegistry.COMMON_TEMPLATES['security'],
-                project_path / 'src' / 'security.py',
-                self.context
-            )
+        self.renderer.render_to_file(
+            TemplateRegistry.COMMON_TEMPLATES['security'],
+            project_path / 'src' / 'security.py',
+            self.context
+        )
 
         # Generate tests
         if self.config.testing_suite:

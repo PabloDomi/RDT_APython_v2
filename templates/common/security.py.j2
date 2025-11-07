@@ -14,6 +14,9 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from passlib.context import CryptContext
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
+{% elif framework == 'Django-Rest' -%}
+from django.contrib.auth.hashers import make_password, check_password
+from datetime import datetime, timedelta
 {% endif -%}
 import secrets
 import re
@@ -69,6 +72,17 @@ class PasswordValidator:
     def verify_password(plain_password: str, hashed_password: str) -> bool:
         """Verify password"""
         return PasswordValidator.pwd_context.verify(plain_password, hashed_password)
+{% elif framework == 'Django-Rest' %}
+
+    @staticmethod
+    def hash_password(password: str) -> str:
+        """Hash password using Django"""
+        return make_password(password)
+
+    @staticmethod
+    def verify_password(password: str, password_hash: str) -> bool:
+        """Verify password against hash"""
+        return check_password(password, password_hash)
 {% endif %}
 
 

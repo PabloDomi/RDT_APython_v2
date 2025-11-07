@@ -10,7 +10,7 @@
 ## ✨ Features
 
 - 🎯 **Multiple Frameworks**: Flask-Restx, FastAPI, Django-Rest
-- 🗄️ **Multiple ORMs**: SQLAlchemy, TortoiseORM, Pewee, Django ORM
+- 🗄️ **Multiple ORMs**: SQLAlchemy, TortoiseORM, Peewee, Django ORM
 - 💾 **Database Support**: PostgreSQL, MySQL, SQLite
 - 🔐 **JWT Authentication**: Secure authentication out of the box
 - 🐳 **Docker Ready**: Complete Docker and docker-compose setup
@@ -134,7 +134,7 @@ rdt --version
 
 | Framework    | Compatible ORMs                    | Async Support |
 |-------------|-----------------------------------|---------------|
-| Flask-Restx | SQLAlchemy, Pewee                 | ❌ Sync       |
+| Flask-Restx | SQLAlchemy, Peewee                 | ❌ Sync       |
 | FastAPI     | SQLAlchemy (async), TortoiseORM   | ✅ Async      |
 | Django-Rest | Django ORM                        | ❌ Sync       |
 

@@ -48,6 +48,9 @@ EXPOSE {{ port }}
 {% if framework == 'FastAPI' -%}
 # Start FastAPI application
 CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "{{ port }}"]
+{% elif framework == 'Django' -%}
+# Start Django application
+CMD ["gunicorn", "--bind", "0.0.0.0:{{ port }}", "--workers", "4", "{{ name | snake_case }}.wsgi:application"]
 {% else -%}
 # Start Flask application
 CMD ["gunicorn", "--bind", "0.0.0.0:{{ port }}", "--workers", "4", "app:app"]

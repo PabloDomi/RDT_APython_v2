@@ -10,6 +10,7 @@ import tempfile
 from rdt.core.config import ProjectConfig
 from rdt.core.generator import ProjectGenerator
 from rdt.core.renderer import TemplateRenderer
+from click.testing import CliRunner
 
 
 @pytest.fixture
@@ -46,3 +47,9 @@ def generator():
 def renderer():
     """Template renderer instance"""
     return TemplateRenderer()
+
+
+@pytest.fixture
+def runner():
+    """Reusable Click CLI test runner"""
+    return CliRunner()

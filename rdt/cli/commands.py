@@ -45,7 +45,7 @@ def cli():
 )
 @click.option(
     '--orm', '-o',
-    type=click.Choice(['SQLAlchemy', 'TortoiseORM', 'Pewee', 'DjangoORM'], case_sensitive=False),
+    type=click.Choice(['SQLAlchemy', 'TortoiseORM', 'Peewee', 'DjangoORM'], case_sensitive=False),
     help='ORM/ODM'
 )
 @click.option(

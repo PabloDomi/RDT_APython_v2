@@ -128,7 +128,7 @@ source venv/bin/activate
 
 # Windows
 python -m venv venv
-venv\\Scripts\\activate
+source venv\\Scripts\\activate
 ```
 
 ### 3. Install dependencies
@@ -177,6 +177,8 @@ aerich init-db
     elif config.framework == 'FastAPI':
         steps += "uvicorn src.main:app --reload\n"
     elif config.framework == 'Django-Rest':
+        steps += "python manage.py makemigrations\n"
+        steps += "python manage.py migrate\n"
         steps += "python manage.py runserver\n"
 
     steps += "```\n\n"

@@ -25,27 +25,27 @@ class Settings(BaseSettings):
     port: int = Field(default={{ port }})
     
     # Database
-    {% if database == 'PostgreSQL' -%}
+    {% if database == 'PostgreSQL' %}
     database_url: str = Field(
         default="postgresql+asyncpg://postgres:postgres@localhost:5432/{{ name }}_db",
         description="Async PostgreSQL connection URL"
     )
-    {% elif database == 'MySQL' -%}
+    {% elif database == 'MySQL' %}
     database_url: str = Field(
         default="mysql+aiomysql://root:root@localhost:3306/{{ name }}_db",
         description="Async MySQL connection URL"
     )
-    {% elif database == 'SQLite' -%}
+    {% elif database == 'SQLite' %}
     database_url: str = Field(
         default="sqlite+aiosqlite:///./{{ name }}.db",
         description="Async SQLite connection URL"
     )
-    {% endif -%}
+    {% endif %}
     
     # SQLAlchemy
     sqlalchemy_echo: bool = Field(default=False)
     
-    {% if auth_enabled -%}
+    {% if auth_enabled %}
     # JWT
     jwt_secret_key: str = Field(
         default="change-this-secret-key-min-32-chars",
@@ -54,7 +54,7 @@ class Settings(BaseSettings):
     )
     jwt_algorithm: str = "HS256"
     jwt_access_token_expires: int = 3600
-    {% endif -%}
+    {% endif %}
     
     # CORS
     cors_origins: list[str] = Field(

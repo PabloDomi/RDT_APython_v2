@@ -8,7 +8,7 @@ from pydantic import BaseModel, Field, field_validator, ConfigDict
 
 # Type definitions for better type safety
 Framework = Literal["Flask-Restx", "FastAPI", "Django-Rest"]
-ORM = Literal["SQLAlchemy", "TortoiseORM", "Pewee", "DjangoORM"]
+ORM = Literal["SQLAlchemy", "TortoiseORM", "Peewee", "DjangoORM"]
 Database = Literal["PostgreSQL", "MySQL", "SQLite"]
 
 
@@ -102,7 +102,7 @@ class ProjectConfig(BaseModel):
         if framework == 'Flask-Restx' and v == 'TortoiseORM':
             raise ValueError(
                 "TortoiseORM is not compatible with Flask-Restx "
-                "(async/sync mismatch). Use SQLAlchemy or Pewee instead."
+                "(async/sync mismatch). Use SQLAlchemy or Peewee instead."
             )
 
         if framework == 'Django-Rest' and v != 'DjangoORM':
@@ -110,9 +110,9 @@ class ProjectConfig(BaseModel):
                 "Django-Rest only works with DjangoORM"
             )
 
-        if framework == 'FastAPI' and v == 'Pewee':
+        if framework == 'FastAPI' and v == 'Peewee':
             raise ValueError(
-                "Pewee is not recommended for FastAPI. "
+                "Peewee is not recommended for FastAPI. "
                 "Use SQLAlchemy (async) or TortoiseORM instead."
             )
 
@@ -161,7 +161,7 @@ class ProjectConfig(BaseModel):
 # Compatibility matrix for reference and documentation
 COMPATIBILITY_MATRIX = {
     'Flask-Restx': {
-        'compatible_orms': ['SQLAlchemy', 'Pewee'],
+        'compatible_orms': ['SQLAlchemy', 'Peewee'],
         'incompatible_orms': ['TortoiseORM', 'DjangoORM'],
         'reason': 'Flask is synchronous, TortoiseORM is async-only',
         'databases': ['PostgreSQL', 'MySQL', 'SQLite'],
@@ -169,14 +169,14 @@ COMPATIBILITY_MATRIX = {
     },
     'FastAPI': {
         'compatible_orms': ['SQLAlchemy', 'TortoiseORM'],
-        'incompatible_orms': ['Pewee', 'DjangoORM'],
-        'reason': 'FastAPI is async, Pewee is sync-only',
+        'incompatible_orms': ['Peewee', 'DjangoORM'],
+        'reason': 'FastAPI is async, Peewee is sync-only',
         'databases': ['PostgreSQL', 'MySQL', 'SQLite'],
         'async_support': True,
     },
     'Django-Rest': {
         'compatible_orms': ['DjangoORM'],
-        'incompatible_orms': ['SQLAlchemy', 'TortoiseORM', 'Pewee'],
+        'incompatible_orms': ['SQLAlchemy', 'TortoiseORM', 'Peewee'],
         'reason': 'Django-Rest uses Django ORM exclusively',
         'databases': ['PostgreSQL', 'MySQL', 'SQLite'],
         'async_support': False,

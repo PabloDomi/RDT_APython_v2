@@ -101,6 +101,17 @@ class ProjectGenerator:
 
     def _create_base_structure(self, project_path: Path, config: ProjectConfig):
         """Create basic directory structure"""
+        
+        # Django tiene su propia estructura, skip base structure
+        if config.framework == 'Django-Rest':
+            # Solo crear tests/ si tiene testing
+            if config.testing_suite:
+                tests_dir = project_path / 'tests'
+                tests_dir.mkdir(exist_ok=True)
+                (tests_dir / '__init__.py').touch()
+            return
+        
+        # Para Flask y FastAPI, crear estructura src/
         dirs = [
             'src',
             'src/models',
@@ -154,11 +165,18 @@ class ProjectGenerator:
 
         # security.py (if auth enabled)
         if config.auth_enabled:
-            self.renderer.render_to_file(
+            # Para Django-Rest, crear en la raíz del proyecto
+            if config.framework == 'Django-Rest':
+                security_path = project_path / 'security.py'
+            else:
+                # Para Flask y FastAPI, crear en src/
+                security_path = project_path / 'src' / 'security.py'
+
+                self.renderer.render_to_file(
                 TemplateRegistry.COMMON_TEMPLATES['security'],
-                project_path / 'src' / 'security.py',
+                security_path,
                 context
-            )
+                )
 
         # pyproject.toml (modern Python packaging)
         self.renderer.render_to_file(
@@ -166,6 +184,14 @@ class ProjectGenerator:
             project_path / 'pyproject.toml',
             context
         )
+
+        # pytest.ini (common test configuration) - place at project root
+        if config.testing_suite:
+            self.renderer.render_to_file(
+                TemplateRegistry.COMMON_TEMPLATES['pytest_ini'],
+                project_path / 'pytest.ini',
+                context
+            )
 
     def _generate_dependencies(self, project_path: Path, config: ProjectConfig):
         """Generate dependency files"""

@@ -2,14 +2,12 @@
 """
 Test CLI commands
 """
-from click.testing import CliRunner
-
 from rdt.cli.commands import cli
+import rdt
 
 
-def test_cli_help():
+def test_cli_help(runner):
     """Test CLI help command"""
-    runner = CliRunner()
     result = runner.invoke(cli, ['--help'])
 
     assert result.exit_code == 0
@@ -17,18 +15,17 @@ def test_cli_help():
     assert 'create' in result.output
 
 
-def test_cli_version():
+def test_cli_version(runner):
     """Test CLI version command"""
-    runner = CliRunner()
     result = runner.invoke(cli, ['--version'])
 
     assert result.exit_code == 0
-    assert '2.0.0' in result.output
+    # Compare against package version rather than hard-coded literal
+    assert rdt.__version__ in result.output
 
 
-def test_cli_list():
+def test_cli_list(runner):
     """Test list command"""
-    runner = CliRunner()
     result = runner.invoke(cli, ['list'])
 
     assert result.exit_code == 0
@@ -36,9 +33,8 @@ def test_cli_list():
     assert 'FastAPI' in result.output
 
 
-def test_cli_info():
+def test_cli_info(runner):
     """Test info command"""
-    runner = CliRunner()
     result = runner.invoke(cli, ['info', 'FastAPI'])
 
     assert result.exit_code == 0
@@ -46,18 +42,16 @@ def test_cli_info():
     assert 'SQLAlchemy' in result.output
 
 
-def test_cli_deps():
+def test_cli_deps(runner):
     """Test deps command"""
-    runner = CliRunner()
     result = runner.invoke(cli, ['deps', 'Flask-Restx'])
 
     assert result.exit_code == 0
     assert 'Dependencies' in result.output
 
 
-def test_cli_create_non_interactive():
+def test_cli_create_non_interactive(runner):
     """Test create command without interaction"""
-    runner = CliRunner()
 
     with runner.isolated_filesystem():
         result = runner.invoke(cli, [
@@ -69,5 +63,5 @@ def test_cli_create_non_interactive():
             '--no-interactive'
         ])
 
-        # Should succeed or fail gracefully
-        assert result.exit_code in [0, 1]
+        # The command may interact with templates on disk; ensure it exits cleanly
+        assert result.exit_code in (0, 1)

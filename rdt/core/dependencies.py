@@ -24,6 +24,7 @@ class DependencyManager:
         "pytest>=7.4.0",
         "pytest-cov>=4.1.0",
         "pytest-asyncio>=0.21.0",  # For async tests
+        "pytest-django>=4.5.2"
     ]
 
     # Framework-specific dependencies
@@ -67,6 +68,7 @@ class DependencyManager:
                 "djangorestframework>=3.14.0",
                 "django-cors-headers>=4.3.0",
                 "django-filter>=23.5",
+                "drf-spectacular>=0.27.0",
             ],
             'auth': [
                 "djangorestframework-simplejwt>=5.3.0",
@@ -110,7 +112,7 @@ class DependencyManager:
                 'SQLite': ["aiosqlite>=0.19.0"],
             },
         },
-        'Pewee': {
+        'Peewee': {
             'base': [
                 "peewee>=3.17.0",
             ],

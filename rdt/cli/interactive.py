@@ -63,10 +63,10 @@ def interactive_setup() -> ProjectConfig:
                 "value": "TortoiseORM"
             })
 
-        if 'Pewee' in compatible_orms:
+        if 'Peewee' in compatible_orms:
             orm_choices.append({
-                "name": "🪶 Pewee - Lightweight, simple, easy to learn",
-                "value": "Pewee"
+                "name": "🪶 Peewee - Lightweight, simple, easy to learn",
+                "value": "Peewee"
             })
 
         orm = inquirer.select(

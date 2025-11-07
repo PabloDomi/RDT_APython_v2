@@ -103,7 +103,7 @@ def get_tortoise_config() -> dict:
                 "default_connection": "default",
             }
         },
-{% if database in ['PostgreSQL', 'MySQL'] -%}
+{% if database in ['PostgreSQL', 'MySQL'] %}
         "use_tz": True,
         "timezone": "UTC",
 {% endif -%}
@@ -125,7 +125,7 @@ TORTOISE_ORM = {
             "default_connection": "default",
         }
     },
-{% if database in ['PostgreSQL', 'MySQL'] -%}
+{% if database in ['PostgreSQL', 'MySQL'] %}
     "use_tz": True,
     "timezone": "UTC",
 {% endif -%}

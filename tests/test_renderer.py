@@ -15,10 +15,17 @@ def test_template_filters(renderer):
     """Test custom filters"""
     # Test filters through the Jinja environment instead of direct method access
     env = renderer.env
-    assert env.filters['pascal_case']("my_project") == "MyProject"
-    assert env.filters['snake_case']("MyProject") == "my_project"
-    assert env.filters['kebab_case']("my_project") == "my-project"
-    assert env.filters['title_case']("my_project") == "My Project"
+
+    cases = [
+        ("pascal_case", "my_project", "MyProject"),
+        ("snake_case", "MyProject", "my_project"),
+        ("kebab_case", "my_project", "my-project"),
+        ("title_case", "my_project", "My Project"),
+    ]
+
+    for fname, inp, expected in cases:
+        assert fname in env.filters
+        assert env.filters[fname](inp) == expected
 
 
 def test_render_simple_template(renderer, temp_dir):

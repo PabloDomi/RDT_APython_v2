@@ -37,27 +37,27 @@ class Settings(BaseSettings):
     log_level: str = Field(default="INFO")
     
     # Database - Peewee uses different format
-{% if database == 'PostgreSQL' -%}
-        database_name: str = Field(default="{{ name }}_db")
+{% if database == 'PostgreSQL' %}
+    database_name: str = Field(default="{{ name }}_db")
     database_host: str = Field(default="localhost")
     database_port: int = Field(default=5432)
     database_user: str = Field(default="postgres")
     database_password: str = Field(default="postgres")
     database_url: str = Field(default="postgresql://postgres:postgres@localhost:5432/{{ name }}_db")
-{% elif database == 'MySQL' -%}
+{% elif database == 'MySQL' %}
     database_name: str = Field(default="{{ name }}_db")
     database_host: str = Field(default="localhost")
     database_port: int = Field(default=3306)
     database_user: str = Field(default="root")
     database_password: str = Field(default="root")
     database_url: str = Field(default="mysql://root:root@localhost:3306/{{ name }}_db")
-{% elif database == 'SQLite' -%}
+{% elif database == 'SQLite' %}
     database_name: str = Field(default="{{ name }}.db")
-    database_url: str = Field(default="sqlite+aiosqlite:///./{{ name }}.db")
-{% endif -%}
+    database_url: str = Field(default="sqlite:///./{{ name }}.db")
+{% endif %}
     
-{% if auth_enabled -%}
-        # JWT
+{% if auth_enabled %}
+    # JWT
     jwt_secret_key: str = Field(
         default="change-this-secret-key-minimum-32-chars",
         min_length=32,
@@ -65,7 +65,7 @@ class Settings(BaseSettings):
     )
     jwt_algorithm: str = Field(default="HS256")
     jwt_access_token_expires: int = Field(default=3600)
-{% endif -%}
+{% endif %}
 
 
 
@@ -77,30 +77,30 @@ settings = Settings()
 class Config:
     """Flask configuration for Peewee"""
     DEBUG = settings.debug
-{% if auth_enabled -%}
-        JWT_SECRET_KEY = settings.jwt_secret_key
+{% if auth_enabled %}
+    # auth enabled
+    JWT_SECRET_KEY = settings.jwt_secret_key
     JWT_ALGORITHM = settings.jwt_algorithm
-{% endif -%}
+{% endif %}
     
-
     # Peewee database config
     DATABASE = {
-{% if database == 'PostgreSQL' -%}
-                'name': settings.database_name,
+{% if database == 'PostgreSQL' %}
+        'name': settings.database_name,
         'engine': 'peewee.PostgresqlDatabase',
         'user': settings.database_user,
         'password': settings.database_password,
         'host': settings.database_host,
         'port': settings.database_port,
-{% elif database == 'MySQL' -%}
-                'name': settings.database_name,
+{% elif database == 'MySQL' %}
+        'name': settings.database_name,
         'engine': 'peewee.MySQLDatabase',
         'user': settings.database_user,
         'password': settings.database_password,
         'host': settings.database_host,
         'port': settings.database_port,
-{% elif database == 'SQLite' -%}
-                'name': settings.database_name,
+{% elif database == 'SQLite' %}
+        'name': settings.database_name,
         'engine': 'peewee.SqliteDatabase',
-{% endif -%}
-        }
+{% endif %}
+    }

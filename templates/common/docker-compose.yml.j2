@@ -8,49 +8,49 @@ services:
     ports:
       - "{{ port }}:{{ port }}"
     environment:
-{% if database == 'PostgreSQL' -%}
+{%- if database == 'PostgreSQL' %}
       - DATABASE_URL=postgresql+asyncpg://postgres:postgres@db:5432/{{ name }}_db
-{% elif database == 'MySQL' -%}
+{%- elif database == 'MySQL' %}
       - DATABASE_URL=mysql+aiomysql://root:password@db:3306/{{ name }}_db
-{% else -%}
-{% if framework == 'FastAPI' and orm == 'SQLAlchemy' -%}
+{%- elif framework == 'FastAPI' and orm == 'SQLAlchemy' %}
       - DATABASE_URL=sqlite+aiosqlite:///app.db
-{% else -%}
+{%- elif framework == 'Django-Rest' %}
+      - DJANGO_SETTINGS_MODULE={{ name | snake_case }}.settings
+{%- else %}
       - DATABASE_URL=sqlite://./app.db
-{% endif -%}
-{% endif -%}
-{% if auth_enabled -%}
+{%- endif %}
+{%- if auth_enabled %}
       - JWT_SECRET_KEY=${JWT_SECRET_KEY:-dev-secret-key-change-in-production}
-{% endif -%}
+{%- endif %}
       - ENVIRONMENT=${ENVIRONMENT:-development}
       - DEBUG=False
-{% if database != 'SQLite' -%}
+{%- if database != 'SQLite' %}
     depends_on:
       db:
         condition: service_healthy
-{% endif -%}
+{%- endif %}
     volumes:
       - .:/app
     networks:
       - app-network
     restart: unless-stopped
-{% if framework == 'Flask-Restx' -%}
-{% if orm == 'SQLAlchemy' -%}
+{%- if framework == 'Flask-Restx' %}
+{%- if orm == 'SQLAlchemy' %}
     command: >
       sh -c "
         flask db upgrade &&
         echo 'Starting Flask application with {{ orm }}...' &&
         gunicorn --bind 0.0.0.0:{{ port }} --workers 4 app:app
       "
-{% elif orm == 'Peewee' -%}
+{%- elif orm == 'Peewee' %}
     command: >
       sh -c "
         echo 'Starting Flask application with {{ orm }}...' &&
         gunicorn --bind 0.0.0.0:{{ port }} --workers 4 app:app
       "
-{% endif -%}
-{% elif framework == 'FastAPI' -%}
-{% if orm == 'SQLAlchemy' -%}
+{%- endif %}
+{%- elif framework == 'FastAPI' %}
+{%- if orm == 'SQLAlchemy' %}
     command: >
       sh -c "
         echo 'Running database migrations...' &&
@@ -58,7 +58,7 @@ services:
         echo 'Starting FastAPI application with {{ orm }}...' &&
         uvicorn src.main:app --host 0.0.0.0 --port {{ port }} --reload
       "
-{% else -%}
+{%- else %}
     command: >
       sh -c "
         echo 'Running database migrations...' &&
@@ -67,16 +67,26 @@ services:
         echo 'Starting FastAPI application with {{ orm }}...' &&
         uvicorn src.main:app --host 0.0.0.0 --port {{ port }} --reload
       "
-{% endif -%}
-{% else -%}
+{%- endif %}
+{%- elif framework == 'Django-Rest' %}
+    command: >
+      sh -c "
+        echo 'Running Django migrations...' &&
+        python manage.py migrate --noinput &&
+        echo 'Collecting static files...' &&
+        python manage.py collectstatic --noinput --clear &&
+        echo 'Starting Django application with Gunicorn...' &&
+        gunicorn --bind 0.0.0.0:{{ port }} --workers 4 {{ name | snake_case }}.wsgi:application
+      "
+{%- else %}
     command: >
       sh -c "
         echo 'Starting Flask application with {{ orm }}...' &&
         gunicorn --bind 0.0.0.0:{{ port }} --workers 4 app:app
       "
-{% endif -%}
+{%- endif %}
 
-{% if database == 'PostgreSQL' -%}
+{%- if database == 'PostgreSQL' %}
   db:
     image: postgres:15-alpine
     container_name: {{ name }}_db
@@ -97,7 +107,7 @@ services:
       retries: 5
     restart: unless-stopped
 
-{% elif database == 'MySQL' -%}
+{%- elif database == 'MySQL' %}
   db:
     image: mysql:8.0
     container_name: {{ name }}_db
@@ -119,7 +129,7 @@ services:
       retries: 5
     restart: unless-stopped
 
-{% endif -%}
+{%- endif %}
   redis:
     image: redis:7-alpine
     container_name: {{ name }}_redis
@@ -138,11 +148,11 @@ networks:
   app-network:
     driver: bridge
 
-{% if database != 'SQLite' -%}
+{%- if database != 'SQLite' %}
 volumes:
-{% if database == 'PostgreSQL' -%}
+{%- if database == 'PostgreSQL' %}
   postgres_data:
-{% elif database == 'MySQL' -%}
+{%- elif database == 'MySQL' %}
   mysql_data:
-{% endif -%}
-{% endif -%}
+{%- endif %}
+{%- endif %}

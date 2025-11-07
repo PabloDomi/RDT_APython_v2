@@ -68,7 +68,7 @@ def test_get_compatible_orms():
     """Test getting compatible ORMs"""
     orms = get_compatible_orms("Flask-Restx")
     assert "SQLAlchemy" in orms
-    assert "Pewee" in orms
+    assert "Peewee" in orms
     assert "TortoiseORM" not in orms
 
 

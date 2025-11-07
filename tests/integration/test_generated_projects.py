@@ -17,7 +17,7 @@ from rdt.core.generator import ProjectGenerator
 @pytest.mark.parametrize("framework,orm,database", [
     ("Flask-Restx", "SQLAlchemy", "PostgreSQL"),
     ("Flask-Restx", "SQLAlchemy", "SQLite"),
-    ("Flask-Restx", "Pewee", "SQLite"),
+    ("Flask-Restx", "Peewee", "SQLite"),
     ("FastAPI", "SQLAlchemy", "PostgreSQL"),
     ("FastAPI", "TortoiseORM", "PostgreSQL"),
 ])

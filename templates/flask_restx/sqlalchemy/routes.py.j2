@@ -86,9 +86,11 @@ class CurrentUser(Resource):
     @user_ns.marshal_with(user_model)
     def get(self):
         """Get current user"""
-        current_user = get_jwt_identity()
-        user = db.session.get(User, current_user)
-        return user if user else user_ns.abort(404, 'Not found')
+        user_id = get_jwt_identity()
+        user = User.query.get(int(user_id))
+        if not user:
+            user_ns.abort(404, 'User not found')
+        return user
 {% else -%}
 
 user_input = user_ns.model('UserInput', {

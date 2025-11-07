@@ -55,6 +55,21 @@ def create_app():
     {% if auth_enabled -%}
     # Initialize JWT
     jwt.init_app(app)
+    
+    # JWT Configuration
+    @jwt.user_identity_loader
+    def user_identity_lookup(user):
+        """Store user ID in token 'sub' field"""
+        return str(user)
+
+    @jwt.user_lookup_loader
+    def user_lookup_callback(_jwt_header, jwt_data):
+        """Load user from token 'sub' field"""
+        identity = jwt_data["sub"]
+        try:
+            return User.get_by_id(int(identity))
+        except DoesNotExist:
+            return None
     {% endif -%}
 
     # Register namespaces
@@ -82,22 +97,3 @@ def create_app():
         return response
 
     return app
-
-{% if auth_enabled %}
-
-# JWT Configuration
-@jwt.user_identity_loader
-def user_identity_lookup(user):
-    """Store user ID in token 'sub' field"""
-    return str(user)
-
-
-@jwt.user_lookup_loader
-def user_lookup_callback(_jwt_header, jwt_data):
-    """Load user from token 'sub' field"""
-    identity = jwt_data["sub"]
-    try:
-        return User.get_by_id(int(identity))
-    except DoesNotExist:
-        return None
-{% endif %}

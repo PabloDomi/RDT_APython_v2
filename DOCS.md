@@ -21,7 +21,7 @@ rdt/
 │   ├── common/           # Plantillas compartidas
 │   ├── flask_restx/      # Específicas de Flask
 │   ├── fastapi/          # Específicas de FastAPI
-│   └── django_rest/      # Específicas de Django
+│   └── django-rest/      # Específicas de Django
 └── tests/                # Suite de pruebas
 ```
 
@@ -587,14 +587,14 @@ markers =
 ```python
 COMPATIBILITY_MATRIX = {
     'Flask-Restx': {
-        'compatible_orms': ['SQLAlchemy', 'Pewee'],
+        'compatible_orms': ['SQLAlchemy', 'Peewee'],
         'incompatible_orms': ['TortoiseORM'],
         'reason': 'Flask is synchronous, TortoiseORM is async-only'
     },
     'FastAPI': {
         'compatible_orms': ['SQLAlchemy', 'TortoiseORM'],
-        'incompatible_orms': ['Pewee'],
-        'reason': 'FastAPI is async, Pewee is sync-only'
+        'incompatible_orms': ['Peewee'],
+        'reason': 'FastAPI is async, Peewee is sync-only'
     }
 }
 ```
@@ -611,7 +611,7 @@ config = ProjectConfig(
 
 # Lanza excepción:
 # ValidationError: TortoiseORM is not compatible with Flask-Restx
-# (async/sync mismatch). Use SQLAlchemy or Pewee instead.
+# (async/sync mismatch). Use SQLAlchemy or Peewee instead.
 ```
 
 ---
@@ -866,7 +866,7 @@ my-api/
    ```bash
    python -m venv venv
    source venv/bin/activate  # Linux/Mac
-   venv\Scripts\activate     # Windows
+   source venv\Scripts\activate     # Windows
    ```
 
 2. **Instalar dependencias**

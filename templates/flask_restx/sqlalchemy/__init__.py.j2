@@ -26,6 +26,18 @@ def create_app(config_name=None):
     migration.init_app(app, db)
     {% if auth_enabled %}
     jwt.init_app(app)
+    
+    # JWT Configuration
+    @jwt.user_identity_loader
+    def user_identity_lookup(user):
+        """Store user ID in token 'sub' field"""
+        return str(user.id)
+
+    @jwt.user_lookup_loader
+    def user_lookup_callback(_jwt_header, jwt_data):
+        """Load user from token 'sub' field"""
+        identity = jwt_data["sub"]
+        return User.query.filter_by(id=int(identity)).one_or_none()
     {% endif %}
 
     # Register namespaces
@@ -38,19 +50,3 @@ def create_app(config_name=None):
         return {'status': 'healthy', 'message': 'Application is running'}, 200
 
     return app
-
-{% if auth_enabled %}
-
-# JWT Configuration
-@jwt.user_identity_loader
-def user_identity_lookup(user):
-    """Store user ID in token 'sub' field"""
-    return str(user.id)
-
-
-@jwt.user_lookup_loader
-def user_lookup_callback(_jwt_header, jwt_data):
-    """Load user from token 'sub' field"""
-    identity = jwt_data["sub"]
-    return User.query.filter_by(id=int(identity)).one_or_none()
-{% endif %}

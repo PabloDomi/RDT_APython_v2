@@ -34,10 +34,12 @@ class TemplateRenderer:
             )
 
         # Configure Jinja2 environment
+        # Configure Jinja2 environment. Disable aggressive block trimming to
+        # preserve indentation in generated source files (important for Python).
         self.env = Environment(
             loader=FileSystemLoader(str(self.template_dir)),
-            trim_blocks=True,
-            lstrip_blocks=True,
+            trim_blocks=False,
+            lstrip_blocks=False,
             keep_trailing_newline=True,
         )
 
@@ -219,13 +221,15 @@ class TemplateRegistry:
                 'models': 'flask_restx/sqlalchemy/models.py.j2',
                 'routes': 'flask_restx/sqlalchemy/routes.py.j2',
                 'config': 'flask_restx/sqlalchemy/config.py.j2',
+                'app': 'flask_restx/sqlalchemy/app.py.j2',
             },
-            'Pewee': {
-                'init': 'flask_restx/pewee/__init__.py.j2',
-                'extensions': 'flask_restx/pewee/extensions.py.j2',
-                'models': 'flask_restx/pewee/models.py.j2',
-                'routes': 'flask_restx/pewee/routes.py.j2',
-                'config': 'flask_restx/pewee/config.py.j2',
+            'Peewee': {
+                'init': 'flask_restx/peewee/__init__.py.j2',
+                'extensions': 'flask_restx/peewee/extensions.py.j2',
+                'models': 'flask_restx/peewee/models.py.j2',
+                'routes': 'flask_restx/peewee/routes.py.j2',
+                'config': 'flask_restx/peewee/config.py.j2',
+                'app': 'flask_restx/peewee/app.py.j2',
             },
         },
         'FastAPI': {
@@ -248,26 +252,26 @@ class TemplateRegistry:
         },
         'Django-Rest': {
             'DjangoORM': {
-                'settings': 'django_rest/settings.py.j2',
-                'urls': 'django_rest/urls.py.j2',
-                'models': 'django_rest/models.py.j2',
-                'serializers': 'django_rest/serializers.py.j2',
-                'views': 'django_rest/views.py.j2',
-                'views_auth': 'django_rest/views_auth.py.j2',
+                'settings': 'django-rest/djangoORM/settings.py.j2',
+                'urls': 'django-rest/djangoORM/urls.py.j2',
+                'models': 'django-rest/djangoORM/models.py.j2',
+                'serializers': 'django-rest/djangoORM/serializers.py.j2',
+                'views': 'django-rest/djangoORM/views.py.j2',
+                'permissions': 'django-rest/djangoORM/permissions.py.j2',
             },
         },
     }
 
     # Common templates used by all projects
     COMMON_TEMPLATES = {
-        'gitignore': 'common/gitignore.j2',
+        'gitignore': 'common/.gitignore.j2',
         'env_example': 'common/env.example.j2',
         'readme': 'common/README.md.j2',
         'license': 'common/LICENSE.j2',
         'dockerfile': 'common/Dockerfile.j2',
         'docker_compose': 'common/docker-compose.yml.j2',
         'dockerignore': 'common/.dockerignore.j2',
-        'app': 'common/app.py.j2',
+        # 'app' intentionally omitted: framework-specific 'app' templates live under each framework
         'security': 'common/security.py.j2',
         'pytest_ini': 'common/pytest.ini.j2',
         'pyproject_toml': 'common/pyproject.toml.j2',
@@ -285,11 +289,11 @@ class TemplateRegistry:
                 'test_security': 'common/test_security.py.j2',
                 '.env_test': 'flask_restx/sqlalchemy/.env.test.example.j2',
             },
-            'Pewee': {
+            'Peewee': {
                 'pytest_ini': 'flask_restx/sqlalchemy/pytest.ini.j2',
-                'conftest': 'flask_restx/pewee/conftest.py.j2',
-                'test_api': 'flask_restx/pewee/test_api.py.j2',
-                'test_models': 'flask_restx/pewee/test_models.py.j2',
+                'conftest': 'flask_restx/peewee/conftest.py.j2',
+                'test_api': 'flask_restx/peewee/test_api.py.j2',
+                'test_models': 'flask_restx/peewee/test_models.py.j2',
                 'test_security': 'common/test_security.py.j2',
                 '.env_test': 'flask_restx/sqlalchemy/.env.test.example.j2',
             },
@@ -314,12 +318,12 @@ class TemplateRegistry:
         },
         'Django-Rest': {
             'DjangoORM': {
-                'pytest_ini': 'flask_restx/sqlalchemy/pytest.ini.j2',
-                'conftest': 'django_rest/conftest.py.j2',
-                'test_api': 'django_rest/test_api.py.j2',
-                'test_models': 'django_rest/test_models.py.j2',
+                'pytest_ini': 'django-rest/djangoORM/pytest.ini.j2',
+                'conftest': 'django-rest/djangoORM/conftest.py.j2',
+                'test_api': 'django-rest/djangoORM/test_api.py.j2',
+                'test_models': 'django-rest/djangoORM/test_models.py.j2',
                 'test_security': 'common/test_security.py.j2',
-                '.env_test': 'flask_restx/sqlalchemy/.env.test.example.j2',
+                '.env_test': 'django-rest/djangoORM/.env.test.example.j2',
             },
         },
     }
@@ -346,13 +350,11 @@ class TemplateRegistry:
         """
         templates = {}
 
-        # Framework-specific templates
-        framework_templates = cls.TEMPLATES.get(framework, {}).get(orm, {})
-
-        templates.update(framework_templates)
-
-        # Common templates
+        # Start with common templates, then overlay framework-specific templates
         templates.update(cls.COMMON_TEMPLATES)
+
+        framework_templates = cls.TEMPLATES.get(framework, {}).get(orm, {})
+        templates.update(framework_templates)
 
         # Test templates
         if testing_suite:
