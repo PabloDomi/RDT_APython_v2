@@ -41,6 +41,10 @@ ruff = "^0.1.8"
 pre-commit = "^3.6.0"
 flask = "^2.3.2"
 flask-restx = "^1.1.0"
+fastapi = "^0.98.0"
+starlette = "^0.27.0"
+sqlalchemy = "^2.2.5"
+httpx = "^0.24.0"
 
 [tool.poetry.scripts]
 rdt = "rdt.cli.commands:cli"

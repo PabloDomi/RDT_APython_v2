@@ -8,11 +8,11 @@ on:
 jobs:
   integration:
     name: Run integration tests
-    strategy:
+      strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        python-version: [3.10, 3.11, 3.12]
+        python-version: ['3.10', '3.11', '3.12']
     runs-on: ${{ matrix.os }}
     concurrency:
       group: integration-${{ matrix.os }}-${{ matrix.python-version }}

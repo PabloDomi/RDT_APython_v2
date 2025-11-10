@@ -41,6 +41,3 @@ CI
 We added a workflow `Integration Tests (nightly)` that runs all integration
 tests on a schedule and can be triggered manually. There's also a separate
 workflow that runs `slow` tests only.
-
-If you want a tighter CI matrix (OSs, Python versions), we can extend the
-workflows to run on a matrix and/or gate PRs to run only the fast subset.
