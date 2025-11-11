@@ -28,12 +28,12 @@ jobs:
       - name: Read project version
         id: read_version
         run: |
-          echo "VERSION=$(python - <<'PY'
+          # Extract version from pyproject.toml using tomllib and store in a temp file
+          python - <<'PY' > /tmp/pyproject_version.txt
 import tomllib
-v = tomllib.load(open('pyproject.toml','rb'))['project']['version']
-print(v)
+print(tomllib.load(open('pyproject.toml','rb'))['project']['version'])
 PY
-)" >> $GITHUB_ENV
+          echo "VERSION=$(cat /tmp/pyproject_version.txt)" >> $GITHUB_ENV
 
       - name: Build distributions
         run: python -m build
