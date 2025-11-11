@@ -9,8 +9,9 @@ import tempfile
 import shutil
 import pytest
 
-from presto.core.config import ProjectConfig
-from presto.core.generator import ProjectGenerator
+from vyte.core.config import ProjectConfig
+from vyte.core.generator import ProjectGenerator
+from tests.integration._utils import safe_rmtree
 
 
 @pytest.mark.integration
@@ -83,7 +84,7 @@ def test_generated_project_structure(framework, orm, database):
 
     finally:
         if temp_dir.exists():
-            shutil.rmtree(temp_dir)
+            safe_rmtree(temp_dir)
 
 
 @pytest.mark.integration
@@ -139,4 +140,4 @@ def test_generated_project_installs():
 
     finally:
         if temp_dir.exists():
-            shutil.rmtree(temp_dir)
+            safe_rmtree(temp_dir)

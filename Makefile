@@ -7,13 +7,13 @@ test:
 	pytest -v
 
 test-cov:
-	pytest --cov=presto --cov-report=html --cov-report=term-missing
+	pytest --cov=vyte --cov-report=html --cov-report=term-missing
 
 test-integration:
 	pytest -v -m integration
 
 test-all:
-	pytest -v --cov=presto --cov-report=html
+	pytest -v --cov=vyte --cov-report=html
 
 install:
 	pip install -e .
@@ -30,13 +30,13 @@ clean:
 	find . -type f -name "*.pyc" -delete
 
 format:
-	black presto/ tests/
-	ruff check --fix presto/ tests/
+	black vyte/ tests/
+	ruff check --fix vyte/ tests/
 
 lint:
-	black --check presto/ tests/
-	ruff check presto/ tests/
-	mypy presto/
+	black --check vyte/ tests/
+	ruff check vyte/ tests/
+	mypy vyte/
 
 pre-commit:
 	pre-commit run --all-files

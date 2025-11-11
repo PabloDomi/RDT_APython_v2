@@ -1,0 +1,83 @@
+name: CI — build / upload to TestPyPI / smoke tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch: {}
+
+jobs:
+  testpypi:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Python 3.12
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - name: Install build tools
+        run: python -m pip install --upgrade pip build twine
+
+      - name: Read project version
+        id: read_version
+        run: |
+          echo "VERSION=$(python - <<'PY'
+import tomllib
+v = tomllib.load(open('pyproject.toml','rb'))['project']['version']
+print(v)
+PY
+)" >> $GITHUB_ENV
+
+      - name: Build distributions
+        run: python -m build
+
+      - name: Twine check
+        run: python -m twine check dist/*
+
+      - name: Upload to TestPyPI
+        if: env.TEST_PYPI_SKIP != 'true'
+        env:
+          TWINE_USERNAME: "__token__"
+          TWINE_PASSWORD: ${{ secrets.TEST_PYPI_API_TOKEN }}
+        run: |
+          # Requires repository secret TEST_PYPI_API_TOKEN (create on GitHub repository Settings → Secrets)
+          python -m twine upload --repository testpypi dist/* -v
+
+      - name: Setup clean Python env and install package from TestPyPI
+        run: |
+          python -m venv venv_test
+          source venv_test/bin/activate
+          python -m pip install --upgrade pip
+          echo "Installing vyte==$VERSION from TestPyPI"
+          pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple vyte==$VERSION
+
+      - name: Basic CLI smoke tests
+        run: |
+          source venv_test/bin/activate
+          set -e
+          vyte --version
+          vyte --help
+          # create a temporary directory and generate a project non-interactively
+          TMPDIR=$(mktemp -d)
+          cd "$TMPDIR"
+          vyte create --no-interactive --name ci_test --framework FastAPI --orm SQLAlchemy --database SQLite
+          if [ ! -d ci_test ]; then
+            echo "Generated project folder not found"; exit 2
+          fi
+          echo "Files in generated project:"; ls -la ci_test | sed -n '1,200p'
+
+      - name: Cleanup test env
+        if: always()
+        run: rm -rf venv_test || true
+
+
+# Notes:
+# - Add repository secret TEST_PYPI_API_TOKEN with a TestPyPI API token (recommended) before enabling this workflow.
+# - You can skip the upload step by setting repository variable TEST_PYPI_SKIP=true for debugging the build/test parts only.

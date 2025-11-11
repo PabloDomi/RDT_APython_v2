@@ -1,8 +1,8 @@
-# Análisis Detallado del Proyecto Presto (Rapid Development Tool)
+# Análisis Detallado del Proyecto Vyte (Rapid Development Tool)
 
 ## 🎯 Visión General
 
-**Presto v2.0** es un generador de proyectos API profesional para Python que permite crear aplicaciones REST completas y listas para producción en segundos. Es como un "scaffolding tool" avanzado que genera código boilerplate estructurado y funcional.
+**Vyte v2.0** es un generador de proyectos API profesional para Python que permite crear aplicaciones REST completas y listas para producción en segundos. Es como un "scaffolding tool" avanzado que genera código boilerplate estructurado y funcional.
 
 ---
 
@@ -11,8 +11,8 @@
 ### Estructura de Directorios Principal
 
 ```
-presto/
-├── presto/                    # Código fuente principal
+vyte/
+├── vyte/                    # Código fuente principal
 │   ├── cli/               # Interfaz de línea de comandos
 │   ├── core/              # Lógica central del generador
 │   ├── strategies/        # Patrón Strategy para frameworks
@@ -29,7 +29,7 @@ presto/
 
 ## 🧩 Componentes Principales
 
-### 1. **Sistema de Configuración (`presto/core/config.py`)**
+### 1. **Sistema de Configuración (`vyte/core/config.py`)**
 
 **Propósito**: Define y valida la configuración del proyecto usando Pydantic.
 
@@ -62,7 +62,7 @@ if framework == 'Django-Rest' and orm != 'DjangoORM':
 
 ---
 
-### 2. **Motor de Plantillas (`presto/core/renderer.py`)**
+### 2. **Motor de Plantillas (`vyte/core/renderer.py`)**
 
 **Propósito**: Renderiza plantillas Jinja2 con el contexto del proyecto.
 
@@ -98,7 +98,7 @@ TEMPLATES = {
 
 ---
 
-### 3. **Generador Principal (`presto/core/generator.py`)**
+### 3. **Generador Principal (`vyte/core/generator.py`)**
 
 **Propósito**: Orquesta todo el proceso de generación usando el patrón Strategy.
 
@@ -124,7 +124,7 @@ TEMPLATES = {
 
 ---
 
-### 4. **Patrón Strategy (`presto/strategies/`)**
+### 4. **Patrón Strategy (`vyte/strategies/`)**
 
 **Propósito**: Implementa lógica específica para cada framework.
 
@@ -163,7 +163,7 @@ Genera:
 
 ---
 
-### 5. **Gestor de Dependencias (`presto/core/dependencies.py`)**
+### 5. **Gestor de Dependencias (`vyte/core/dependencies.py`)**
 
 **Propósito**: Gestiona declarativamente todas las dependencias del proyecto.
 
@@ -206,19 +206,19 @@ deps = [
 
 ---
 
-### 6. **Interfaz CLI (`presto/cli/`)**
+### 6. **Interfaz CLI (`vyte/cli/`)**
 
 **Propósito**: Proporciona comandos de terminal con UI rica.
 
 #### **commands.py** - Comandos principales
 
 ```bash
-presto create                    # Crear proyecto (interactivo)
-presto create --name my-api ...  # Crear con opciones
-presto list                      # Listar frameworks/ORMs
-presto info FastAPI             # Info de un framework
-presto deps Flask-Restx         # Ver dependencias
-presto validate ./my-api        # Validar proyecto existente
+vyte create                    # Crear proyecto (interactivo)
+vyte create --name my-api ...  # Crear con opciones
+vyte list                      # Listar frameworks/ORMs
+vyte info FastAPI             # Info de un framework
+vyte deps Flask-Restx         # Ver dependencias
+vyte validate ./my-api        # Validar proyecto existente
 ```
 
 #### **interactive.py** - Modo interactivo
@@ -251,7 +251,7 @@ Muestra:
 ### Ejemplo: Generar API FastAPI con Auth
 
 ```bash
-$ presto create
+$ vyte create
 ```
 
 **Paso 1: Recopilación de información**
@@ -346,7 +346,7 @@ tests/
 ```jinja2
 # {{ name | title_case }}
 
-> API project generated with presto v2.0
+> API project generated with vyte v2.0
 
 ## 🚀 Quick Start
 
@@ -381,7 +381,7 @@ renderer.render('common/README.md.j2', context)
 ```markdown
 # My Awesome Api
 
-> API project generated with presto v2.0
+> API project generated with vyte v2.0
 
 ## 🚀 Quick Start
 
@@ -705,19 +705,19 @@ summary = generator.get_generation_summary(config)
 
 ### Startup que necesita MVP rápido
 ```bash
-presto create --name mvp-api --framework FastAPI --database SQLite --no-docker
+vyte create --name mvp-api --framework FastAPI --database SQLite --no-docker
 # En 10 segundos: API funcional con auth, lista para desarrollo
 ```
 
 ### Microservicio empresarial
 ```bash
-presto create --name user-service --framework FastAPI --orm SQLAlchemy --database PostgreSQL
+vyte create --name user-service --framework FastAPI --orm SQLAlchemy --database PostgreSQL
 # Resultado: Servicio completo con Docker, tests, CI/CD ready
 ```
 
 ### Prototipo educativo
 ```bash
-presto create --name learning-api --framework Flask-Restx --database SQLite --no-auth
+vyte create --name learning-api --framework Flask-Restx --database SQLite --no-auth
 # API simple para aprender sin complejidad innecesaria
 ```
 
@@ -729,7 +729,7 @@ presto create --name learning-api --framework Flask-Restx --database SQLite --no
 
 **1. Crear estrategia**:
 ```python
-# presto/strategies/express.py
+# vyte/strategies/express.py
 class ExpressStrategy(BaseStrategy):
     def generate_structure(self, project_path: Path):
         # Estructura Node.js
@@ -788,7 +788,7 @@ COMPATIBILITY_MATRIX = {
 
 ## 🎓 Conclusión
 
-**presto** es un sistema de generación de código inteligente que:
+**vyte** es un sistema de generación de código inteligente que:
 
 1. **Automatiza** el setup inicial tedioso de proyectos API
 2. **Estandariza** estructuras y mejores prácticas
@@ -812,22 +812,22 @@ Es la herramienta perfecta para:
 
 ```bash
 # Ver todas las opciones
-presto --help
+vyte --help
 
 # Crear proyecto interactivo
-presto create
+vyte create
 
 # Ver información de framework
-presto info FastAPI
+vyte info FastAPI
 
 # Listar frameworks disponibles
-presto list
+vyte list
 
 # Ver dependencias de una configuración
-presto deps Flask-Restx --orm SQLAlchemy
+vyte deps Flask-Restx --orm SQLAlchemy
 
 # Validar proyecto existente
-presto validate ./my-project
+vyte validate ./my-project
 ```
 
 ### Estructura de un Proyecto Generado
@@ -905,4 +905,4 @@ my-api/
 
 **Versión del documento**: 1.0  
 **Última actualización**: 2025  
-**Autor**: Análisis del proyecto presto v2.0
+**Autor**: Análisis del proyecto vyte v2.0

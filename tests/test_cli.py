@@ -2,8 +2,8 @@
 """
 Test CLI commands
 """
-from presto.cli.commands import cli
-import presto
+from vyte.cli.commands import cli
+import vyte
 
 
 def test_cli_help(runner):
@@ -11,7 +11,7 @@ def test_cli_help(runner):
     result = runner.invoke(cli, ['--help'])
 
     assert result.exit_code == 0
-    assert 'presto' in result.output
+    assert 'vyte' in result.output
     assert 'create' in result.output
 
 
@@ -21,7 +21,7 @@ def test_cli_version(runner):
 
     assert result.exit_code == 0
     # Compare against package version rather than hard-coded literal
-    assert presto.__version__ in result.output
+    assert vyte.__version__ in result.output
 
 
 def test_cli_list(runner):

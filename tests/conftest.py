@@ -6,10 +6,13 @@ import pytest
 from pathlib import Path
 import shutil
 import tempfile
+import time
+import os
+import stat
 
-from presto.core.config import ProjectConfig
-from presto.core.generator import ProjectGenerator
-from presto.core.renderer import TemplateRenderer
+from vyte.core.config import ProjectConfig
+from vyte.core.generator import ProjectGenerator
+from vyte.core.renderer import TemplateRenderer
 from click.testing import CliRunner
 
 
@@ -19,7 +22,26 @@ def temp_dir():
     temp = Path(tempfile.mkdtemp())
     yield temp
     if temp.exists():
-        shutil.rmtree(temp)
+        # Use a robust rmtree to handle transient Windows file locks
+        for _ in range(5):
+            try:
+                shutil.rmtree(temp)
+                break
+            except Exception:
+                time.sleep(0.1)
+        else:
+            # Last attempt with onerror handler to try clearing readonly flags
+            def _onerror(func, path, excinfo):
+                try:
+                    os.chmod(path, stat.S_IWRITE)
+                    func(path)
+                except Exception:
+                    pass
+
+            try:
+                shutil.rmtree(temp, onerror=_onerror)
+            except Exception:
+                pass
 
 
 @pytest.fixture

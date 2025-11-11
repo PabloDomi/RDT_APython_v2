@@ -1,6 +1,6 @@
-# 🚀 presto - Rapid Development Tool
+# 🚀 vyte - Rapid Development Tool
 
-[![PyPI version](https://badge.fury.io/py/presto.svg)](https://badge.fury.io/py/presto)
+[![PyPI version](https://badge.fury.io/py/vyte.svg)](https://badge.fury.io/py/vyte)
 [![Python Version](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
@@ -25,14 +25,14 @@
 
 ```bash
 # Using pip
-pip install presto
+pip install vyte
 
 # Using pipx (recommended)
-pipx install presto
+pipx install vyte
 
 # From source
-git clone https://github.com/yourusername/presto.git
-cd presto
+git clone https://github.com/yourusername/Vyte.git
+cd vyte
 pip install -e .
 ```
 
@@ -40,10 +40,10 @@ pip install -e .
 
 ```bash
 # Interactive mode (recommended)
-presto create
+vyte create
 
 # Or specify options directly
-presto create \
+vyte create \
   --name my-api \
   --framework FastAPI \
   --orm SQLAlchemy \
@@ -86,7 +86,7 @@ my-api/
 The easiest way to create a project:
 
 ```bash
-presto create
+vyte create
 ```
 
 Follow the prompts to configure your project.
@@ -94,7 +94,7 @@ Follow the prompts to configure your project.
 ### Command Line Options
 
 ```bash
-presto create \
+vyte create \
   --name my-api \
   --framework FastAPI \
   --orm SQLAlchemy \
@@ -109,25 +109,25 @@ presto create \
 
 ```bash
 # Create new project
-presto create
+vyte create
 
 # Show framework information
-presto info FastAPI
+vyte info FastAPI
 
 # List all frameworks and ORMs
-presto list
+vyte list
 
 # Show dependencies for configuration
-presto deps FastAPI --orm SQLAlchemy
+vyte deps FastAPI --orm SQLAlchemy
 
 # Validate existing project
-presto validate ./my-api
+vyte validate ./my-api
 
 # Open documentation
-presto docs
+vyte docs
 
 # Show version
-presto --version
+vyte --version
 ```
 
 ## 🎯 Supported Combinations
@@ -182,8 +182,8 @@ docker-compose down
 
 ## 📚 Documentation
 
-- [Full Documentation](https://presto.readthedocs.io)
-- [API Reference](https://presto.readthedocs.io/api)
+- [Full Documentation](https://vyte.readthedocs.io)
+- [API Reference](https://vyte.readthedocs.io/api)
 - [Examples](./examples)
 - [Contributing Guide](./CONTRIBUTING.md)
 
@@ -193,8 +193,8 @@ Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md)
 
 ```bash
 # Clone repo
-git clone https://github.com/yourusername/presto.git
-cd presto
+git clone https://github.com/yourusername/Vyte.git
+cd vyte
 
 # Install with dev dependencies
 poetry install
@@ -220,10 +220,10 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ## 📧 Contact
 
-- **Issues**: [GitHub Issues](https://github.com/yourusername/presto/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/yourusername/presto/discussions)
+- **Issues**: [GitHub Issues](https://github.com/yourusername/Vyte/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/yourusername/Vyte/discussions)
 - **Email**: your.email@example.com
 
 ---
 
-Made with ❤️ by the presto team
+Made with ❤️ by the Vyte team

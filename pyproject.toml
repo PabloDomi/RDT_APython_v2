@@ -1,13 +1,14 @@
 [project]
-name = "presto"
-version = "2.0.1"
+name = "vyte"
+version = "2.0.2"
 description = "Professional API project generator for Python - Flask, FastAPI, Django-Rest"
 readme = "README.md"
 requires-python = ">=3.11,<4.0"
 authors = [ { name = "PabloDomi", email = "Domi@usal.es" } ]
 license = "MIT"
-license-files = ["LICENSE"]
 keywords = ["api", "generator", "flask", "fastapi", "django", "scaffolding", "boilerplate"]
+packages = [{ include = "vyte" }]
+
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
@@ -35,11 +36,19 @@ dev = [
 ]
 
 [project.scripts]
-presto = "presto.cli.commands:cli"
+vyte = "vyte.cli.commands:cli"
 
 [project.urls]
-"Homepage" = "https://github.com/PabloDomi/Presto"
-"Bug Tracker" = "https://github.com/PabloDomi/Presto/issues"
+"Homepage" = "https://github.com/PabloDomi/Vyte"
+"Bug Tracker" = "https://github.com/PabloDomi/Vyte/issues"
+
+[build-system]
+requires = ["poetry-core>=1.5.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+packages = [ { include = "vyte" } ]
+include = [ { path = "templates" } ]
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.3"
@@ -68,7 +77,7 @@ testpaths = ["tests"]
 python_files = "test_*.py"
 python_classes = "Test*"
 python_functions = "test_*"
-addopts = "-v --cov=presto --cov-report=html --cov-report=term-missing"
+addopts = "-v --cov=vyte --cov-report=html --cov-report=term-missing"
 markers = [
     "integration: marks tests as integration tests (deselect with '-m \"not integration\"')",
     "slow: marks slow tests to be run separately (e.g., nightly or on-demand)",

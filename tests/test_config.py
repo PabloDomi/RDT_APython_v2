@@ -5,7 +5,7 @@ Test configuration module
 import pytest
 from pydantic import ValidationError
 
-from presto.core.config import (
+from vyte.core.config import (
     ProjectConfig,
     validate_combination,
     get_compatible_orms,

@@ -9,6 +9,32 @@ import importlib
 import types
 import time
 from typing import Optional
+import time
+import os
+import stat
+
+
+def safe_rmtree(path):
+    """Remove a directory tree with retries and an onerror handler for Windows locks."""
+    p = str(path)
+    for _ in range(5):
+        try:
+            shutil.rmtree(p)
+            return
+        except Exception:
+            time.sleep(0.1)
+    # Last attempt with onerror to clear read-only flags
+    def _onerror(func, path, excinfo):
+        try:
+            os.chmod(path, stat.S_IWRITE)
+            func(path)
+        except Exception:
+            pass
+
+    try:
+        shutil.rmtree(p, onerror=_onerror)
+    except Exception:
+        pass
 
 
 def insert_project_path(project_path: Path) -> None:

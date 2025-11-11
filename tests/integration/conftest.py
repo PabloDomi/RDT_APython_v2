@@ -12,11 +12,12 @@ from tests.integration._utils import (
     insert_project_path,
     remove_project_path,
     import_with_retry,
+    safe_rmtree,
 )
 from tests.integration._utils import manual_load_module_from_path
 
-from presto.core.config import ProjectConfig
-from presto.core.generator import ProjectGenerator
+from vyte.core.config import ProjectConfig
+from vyte.core.generator import ProjectGenerator
 
 
 @pytest.fixture(scope="function")
@@ -159,7 +160,7 @@ async def create_item(item: dict):
 
     finally:
         if temp_dir.exists():
-            shutil.rmtree(temp_dir)
+            safe_rmtree(temp_dir)
 
 
 @pytest.fixture(scope="function")
@@ -366,4 +367,4 @@ if router is not None:
 
     finally:
         if temp_dir.exists():
-            shutil.rmtree(temp_dir)
+            safe_rmtree(temp_dir)

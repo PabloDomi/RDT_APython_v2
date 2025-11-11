@@ -2,8 +2,8 @@
 """
 Test dependency management
 """
-from presto.core.dependencies import DependencyManager
-from presto.core.config import ProjectConfig
+from vyte.core.dependencies import DependencyManager
+from vyte.core.config import ProjectConfig
 
 
 def test_get_all_dependencies():

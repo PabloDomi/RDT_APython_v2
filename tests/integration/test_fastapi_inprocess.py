@@ -8,8 +8,9 @@ import importlib
 from fastapi.testclient import TestClient
 import pytest
 
-from presto.core.config import ProjectConfig
-from presto.core.generator import ProjectGenerator
+from vyte.core.config import ProjectConfig
+from vyte.core.generator import ProjectGenerator
+from tests.integration._utils import safe_rmtree
 
 
 @pytest.mark.integration
@@ -130,4 +131,4 @@ async def stub_health():
 
     finally:
         if temp_dir.exists():
-            shutil.rmtree(temp_dir)
+            safe_rmtree(temp_dir)

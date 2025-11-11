@@ -2,7 +2,7 @@
 """
 Test template rendering
 """
-from presto.core.renderer import TemplateRegistry
+from vyte.core.renderer import TemplateRegistry
 
 
 def test_renderer_initialization(renderer):

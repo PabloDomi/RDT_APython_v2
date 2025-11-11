@@ -6,9 +6,9 @@ from pathlib import Path
 
 import pytest
 
-from tests.integration._utils import insert_project_path, remove_project_path, import_with_retry
-from presto.core.config import ProjectConfig
-from presto.core.generator import ProjectGenerator
+from tests.integration._utils import insert_project_path, remove_project_path, import_with_retry, safe_rmtree
+from vyte.core.config import ProjectConfig
+from vyte.core.generator import ProjectGenerator
 
 
 @pytest.mark.integration
@@ -175,4 +175,4 @@ user_ns.routes = [
 
     finally:
         if temp_dir.exists():
-            shutil.rmtree(temp_dir)
+            safe_rmtree(temp_dir)
