@@ -65,6 +65,9 @@ async def get_db():
 
         # Replace generated api/routes.py with a lightweight stub to avoid importing models
         api_dir = src_dir / "api"
+        # Ensure api package exists so writing files won't fail on some filesystems/CI
+        api_dir.mkdir(parents=True, exist_ok=True)
+        (api_dir / "__init__.py").touch()
         routes_stub = api_dir / "routes.py"
         routes_stub.write_text(
             """from fastapi import APIRouter

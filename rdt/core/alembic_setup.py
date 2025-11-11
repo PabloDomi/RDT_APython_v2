@@ -1,7 +1,7 @@
 """
 Alembic setup and configuration automation
 """
-from encodings import utf_8
+# Use explicit encoding string when writing files. Do not import codec module here.
 import subprocess
 import os
 from pathlib import Path
@@ -252,7 +252,7 @@ format = %(levelname)-5.5s [%(name)s] %(message)s
 datefmt = %H:%M:%S
 """
 
-        with open(project_path / "alembic.ini", 'w', encoding=utf_8) as f:
+        with open(project_path / "alembic.ini", 'w', encoding='utf-8') as f:
             f.write(alembic_ini_content)
 
         # Create env.py
@@ -291,7 +291,7 @@ def downgrade() -> None:
     ${downgrades if downgrades else "pass"}
 '''
 
-        with open(alembic_dir / "script.py.mako", 'w', encoding=utf_8) as f:
+        with open(alembic_dir / "script.py.mako", 'w', encoding='utf-8') as f:
             f.write(script_mako_content)
 
         print("  ✅ Alembic structure created manually")
