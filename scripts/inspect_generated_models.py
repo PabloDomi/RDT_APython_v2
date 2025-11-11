@@ -2,8 +2,8 @@ import tempfile
 import os
 from pathlib import Path
 
-from rdt.core.generator import ProjectGenerator
-from rdt.core.config import ProjectConfig
+from presto.core.generator import ProjectGenerator
+from presto.core.config import ProjectConfig
 
 config = ProjectConfig(
     name="integration-test",

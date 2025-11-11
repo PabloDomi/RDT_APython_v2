@@ -2,8 +2,8 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="rdt-api-generator",
-    version="2.0.0",
+    name="presto",
+    version="2.0.1",
     packages=find_packages(),
     include_package_data=True,
     install_requires=[
@@ -17,15 +17,15 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'rdt=rdt.cli.commands:cli',
+            'presto=presto.cli.commands:cli',
         ],
     },
-    author="Your Name",
-    author_email="your.email@example.com",
+    author="Pablo Domínguez Blanco",
+    author_email="Domi@usal.es",
     description="Professional API project generator for Python",
     long_description=open("README.md", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
-    url="https://github.com/yourusername/rdt",
+    url="https://github.com/PabloDomi/Presto",
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",

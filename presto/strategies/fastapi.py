@@ -2,9 +2,9 @@
 Strategy for FastAPI projects
 """
 from pathlib import Path
-from rdt.strategies.base import BaseStrategy
-from rdt.core.renderer import TemplateRegistry
-from rdt.core.alembic_setup import AlembicConfigurator
+from presto.strategies.base import BaseStrategy
+from presto.core.renderer import TemplateRegistry
+from presto.core.alembic_setup import AlembicConfigurator
 
 
 class FastAPIStrategy(BaseStrategy):

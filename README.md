@@ -1,6 +1,6 @@
-# 🚀 RDT - Rapid Development Tool
+# 🚀 presto - Rapid Development Tool
 
-[![PyPI version](https://badge.fury.io/py/rdt-api-generator.svg)](https://badge.fury.io/py/rdt-api-generator)
+[![PyPI version](https://badge.fury.io/py/presto.svg)](https://badge.fury.io/py/presto)
 [![Python Version](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
@@ -25,14 +25,14 @@
 
 ```bash
 # Using pip
-pip install rdt-api-generator
+pip install presto
 
 # Using pipx (recommended)
-pipx install rdt-api-generator
+pipx install presto
 
 # From source
-git clone https://github.com/yourusername/rdt.git
-cd rdt
+git clone https://github.com/yourusername/presto.git
+cd presto
 pip install -e .
 ```
 
@@ -40,10 +40,10 @@ pip install -e .
 
 ```bash
 # Interactive mode (recommended)
-rdt create
+presto create
 
 # Or specify options directly
-rdt create \
+presto create \
   --name my-api \
   --framework FastAPI \
   --orm SQLAlchemy \
@@ -86,7 +86,7 @@ my-api/
 The easiest way to create a project:
 
 ```bash
-rdt create
+presto create
 ```
 
 Follow the prompts to configure your project.
@@ -94,7 +94,7 @@ Follow the prompts to configure your project.
 ### Command Line Options
 
 ```bash
-rdt create \
+presto create \
   --name my-api \
   --framework FastAPI \
   --orm SQLAlchemy \
@@ -109,25 +109,25 @@ rdt create \
 
 ```bash
 # Create new project
-rdt create
+presto create
 
 # Show framework information
-rdt info FastAPI
+presto info FastAPI
 
 # List all frameworks and ORMs
-rdt list
+presto list
 
 # Show dependencies for configuration
-rdt deps FastAPI --orm SQLAlchemy
+presto deps FastAPI --orm SQLAlchemy
 
 # Validate existing project
-rdt validate ./my-api
+presto validate ./my-api
 
 # Open documentation
-rdt docs
+presto docs
 
 # Show version
-rdt --version
+presto --version
 ```
 
 ## 🎯 Supported Combinations
@@ -182,8 +182,8 @@ docker-compose down
 
 ## 📚 Documentation
 
-- [Full Documentation](https://rdt.readthedocs.io)
-- [API Reference](https://rdt.readthedocs.io/api)
+- [Full Documentation](https://presto.readthedocs.io)
+- [API Reference](https://presto.readthedocs.io/api)
 - [Examples](./examples)
 - [Contributing Guide](./CONTRIBUTING.md)
 
@@ -193,8 +193,8 @@ Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md)
 
 ```bash
 # Clone repo
-git clone https://github.com/yourusername/rdt.git
-cd rdt
+git clone https://github.com/yourusername/presto.git
+cd presto
 
 # Install with dev dependencies
 poetry install
@@ -220,10 +220,10 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ## 📧 Contact
 
-- **Issues**: [GitHub Issues](https://github.com/yourusername/rdt/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/yourusername/rdt/discussions)
+- **Issues**: [GitHub Issues](https://github.com/yourusername/presto/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/yourusername/presto/discussions)
 - **Email**: your.email@example.com
 
 ---
 
-Made with ❤️ by the RDT team
+Made with ❤️ by the presto team

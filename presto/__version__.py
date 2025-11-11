@@ -1,4 +1,4 @@
-# rdt/__version__.py
+# presto/__version__.py
 """Version information"""
 
 VERSION = (2, 0, 0)

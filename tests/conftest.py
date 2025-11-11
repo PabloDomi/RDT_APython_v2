@@ -7,9 +7,9 @@ from pathlib import Path
 import shutil
 import tempfile
 
-from rdt.core.config import ProjectConfig
-from rdt.core.generator import ProjectGenerator
-from rdt.core.renderer import TemplateRenderer
+from presto.core.config import ProjectConfig
+from presto.core.generator import ProjectGenerator
+from presto.core.renderer import TemplateRenderer
 from click.testing import CliRunner
 
 

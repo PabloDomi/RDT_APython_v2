@@ -1,7 +1,7 @@
 import tempfile, os, sys
 from pathlib import Path
-from rdt.core.config import ProjectConfig
-from rdt.core.generator import ProjectGenerator
+from presto.core.config import ProjectConfig
+from presto.core.generator import ProjectGenerator
 import importlib
 
 temp_dir = Path(tempfile.mkdtemp())

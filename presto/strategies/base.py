@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Dict, Any
-from rdt.core.config import ProjectConfig
-from rdt.core.renderer import TemplateRenderer
+from presto.core.config import ProjectConfig
+from presto.core.renderer import TemplateRenderer
 
 class BaseStrategy(ABC):
     """

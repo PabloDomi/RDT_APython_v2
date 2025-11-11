@@ -5,7 +5,7 @@ Test configuration module
 import pytest
 from pydantic import ValidationError
 
-from rdt.core.config import (
+from presto.core.config import (
     ProjectConfig,
     validate_combination,
     get_compatible_orms,

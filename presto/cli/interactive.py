@@ -1,4 +1,4 @@
-# rdt/cli/interactive.py
+# presto/cli/interactive.py
 """
 Interactive setup for project configuration
 """

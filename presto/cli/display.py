@@ -1,4 +1,4 @@
-# rdt/cli/display.py
+# presto/cli/display.py
 """
 Display utilities using Rich
 """
@@ -22,7 +22,7 @@ def show_welcome():
     banner = """
     ╔═══════════════════════════════════════════╗
     ║                                           ║
-    ║        🚀  RDT v2.0                      ║
+    ║        🚀  presto v2.0                      ║
     ║     Rapid Development Tool                ║
     ║                                           ║
     ║   Professional API Generator for Python   ║

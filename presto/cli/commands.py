@@ -1,5 +1,5 @@
 """
-CLI commands for RDT
+CLI commands for presto
 """
 import sys
 from pathlib import Path
@@ -27,10 +27,10 @@ console = Console()
 
 
 @click.group()
-@click.version_option(version="2.0.0", prog_name="RDT")
+@click.version_option(version="2.0.0", prog_name="presto")
 def cli():
     """
-    🚀 RDT - Rapid Development Tool
+    🚀 presto - Rapid Development Tool
 
     Professional API project generator for Python.
     Supports Flask-Restx, FastAPI, and Django-Rest with multiple ORMs.
@@ -69,13 +69,13 @@ def create(name, framework, orm, database, auth, docker, tests, git, interactive
     Examples:
 
         # Interactive mode (recommended)
-        rdt create
+        presto create
 
         # Quick creation
-        rdt create --name my-api --framework FastAPI --orm SQLAlchemy --database PostgreSQL
+        presto create --name my-api --framework FastAPI --orm SQLAlchemy --database PostgreSQL
 
         # No authentication
-        rdt create -n my-api -f Flask-Restx -o SQLAlchemy -d SQLite --no-auth
+        presto create -n my-api -f Flask-Restx -o SQLAlchemy -d SQLite --no-auth
     """
     show_welcome()
 
@@ -153,8 +153,8 @@ def info(framework):
     Show detailed information about a framework
 
     Examples:
-        rdt info FastAPI
-        rdt info Flask-Restx
+        presto info FastAPI
+        presto info Flask-Restx
     """
 
     framework_info = get_framework_info(framework)
@@ -194,8 +194,8 @@ def deps(framework, orm, database, auth):
     Show dependencies for a configuration
 
     Examples:
-        rdt deps FastAPI
-        rdt deps Flask-Restx --orm SQLAlchemy --database PostgreSQL
+        presto deps FastAPI
+        presto deps Flask-Restx --orm SQLAlchemy --database PostgreSQL
     """
     # Use defaults if not specified
     if not orm:
@@ -272,7 +272,7 @@ def validate(project_path):
     Validate an existing project structure
 
     Examples:
-        rdt validate ./my-api
+        presto validate ./my-api
     """
     project_path = Path(project_path)
 
@@ -319,7 +319,7 @@ def validate(project_path):
 def docs():
     """Open documentation in browser"""
     import webbrowser
-    url = "https://github.com/yourusername/rdt"
+    url = "https://github.com/yourusername/presto"
     console.print(f"\n[cyan]Opening documentation: {url}[/cyan]\n")
     webbrowser.open(url)
 
@@ -346,7 +346,7 @@ def _init_git(project_path: Path):
         )
 
         subprocess.run(
-            ['git', 'commit', '-m', 'Initial commit from RDT'],
+            ['git', 'commit', '-m', 'Initial commit from presto'],
             cwd=project_path,
             check=True,
             capture_output=True

@@ -2,8 +2,8 @@
 Strategy for Flask-Restx projects
 """
 from pathlib import Path
-from rdt.strategies.base import BaseStrategy
-from rdt.core.renderer import TemplateRegistry
+from presto.strategies.base import BaseStrategy
+from presto.core.renderer import TemplateRegistry
 
 
 class FlaskRestxStrategy(BaseStrategy):

@@ -15,8 +15,8 @@ from tests.integration._utils import (
 )
 from tests.integration._utils import manual_load_module_from_path
 
-from rdt.core.config import ProjectConfig
-from rdt.core.generator import ProjectGenerator
+from presto.core.config import ProjectConfig
+from presto.core.generator import ProjectGenerator
 
 
 @pytest.fixture(scope="function")

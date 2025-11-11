@@ -1,6 +1,6 @@
-# rdt/cli/__init__.py
+# presto/cli/__init__.py
 """
-CLI module for RDT
+CLI module for presto
 """
 from .commands import cli
 from .interactive import interactive_setup

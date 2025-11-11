@@ -3,10 +3,10 @@
 Test strategy pattern implementations
 """
 
-from rdt.core.config import ProjectConfig
-from rdt.core.renderer import TemplateRenderer
-from rdt.strategies.flask_restx import FlaskRestxStrategy
-from rdt.strategies.fastapi import FastAPIStrategy
+from presto.core.config import ProjectConfig
+from presto.core.renderer import TemplateRenderer
+from presto.strategies.flask_restx import FlaskRestxStrategy
+from presto.strategies.fastapi import FastAPIStrategy
 
 
 def test_flask_strategy():

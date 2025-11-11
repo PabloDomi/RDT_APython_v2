@@ -7,8 +7,8 @@ from pathlib import Path
 import pytest
 
 from tests.integration._utils import insert_project_path, remove_project_path, import_with_retry
-from rdt.core.config import ProjectConfig
-from rdt.core.generator import ProjectGenerator
+from presto.core.config import ProjectConfig
+from presto.core.generator import ProjectGenerator
 
 
 @pytest.mark.integration

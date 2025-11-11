@@ -1,6 +1,6 @@
-# rdt/__init__.py
+# presto/__init__.py
 """
-RDT - Rapid Development Tool
+presto - Rapid Development Tool
 
 Professional API project generator for Python
 """

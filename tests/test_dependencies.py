@@ -2,8 +2,8 @@
 """
 Test dependency management
 """
-from rdt.core.dependencies import DependencyManager
-from rdt.core.config import ProjectConfig
+from presto.core.dependencies import DependencyManager
+from presto.core.config import ProjectConfig
 
 
 def test_get_all_dependencies():
