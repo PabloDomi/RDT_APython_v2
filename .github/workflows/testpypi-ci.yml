@@ -13,14 +13,16 @@ jobs:
     permissions:
       contents: read
       packages: write
+      id-token: write  # Needed for trusted publishing (optional)
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
 
       - name: Setup Python 3.12
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5  # ← Actualizado de v4 a v5
         with:
           python-version: '3.12'
+          cache: 'pip'  # ← Añadido para cache de dependencias
 
       - name: Install build tools
         run: python -m pip install --upgrade pip build twine
@@ -28,12 +30,17 @@ jobs:
       - name: Read project version
         id: read_version
         run: |
-          # Extract version from pyproject.toml using tomllib and store in a temp file
+          # Extract version from pyproject.toml using tomllib
           python - <<'PY' > /tmp/pyproject_version.txt
-import tomllib
-print(tomllib.load(open('pyproject.toml','rb'))['project']['version'])
-PY
-          echo "VERSION=$(cat /tmp/pyproject_version.txt)" >> $GITHUB_ENV
+          import tomllib
+          with open('pyproject.toml', 'rb') as f:
+              data = tomllib.load(f)
+              print(data['project']['version'])
+          PY
+          VERSION=$(cat /tmp/pyproject_version.txt)
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "version=$VERSION" >> $GITHUB_OUTPUT  # ← Mejor práctica
+          echo "📦 Package version: $VERSION"
 
       - name: Build distributions
         run: python -m build
@@ -42,36 +49,60 @@ PY
         run: python -m twine check dist/*
 
       - name: Upload to TestPyPI
-        if: env.TEST_PYPI_SKIP != 'true'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.TEST_PYPI_SKIP != 'true'  # ← Condición mejorada
         env:
           TWINE_USERNAME: "__token__"
           TWINE_PASSWORD: ${{ secrets.TEST_PYPI_API_TOKEN }}
         run: |
-          # Requires repository secret TEST_PYPI_API_TOKEN (create on GitHub repository Settings → Secrets)
-          python -m twine upload --repository testpypi dist/* -v
+          echo "📤 Uploading version $VERSION to TestPyPI..."
+          python -m twine upload --repository testpypi dist/* --verbose --skip-existing
+
+      - name: Wait for TestPyPI propagation
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.TEST_PYPI_SKIP != 'true'
+        run: |
+          echo "⏳ Waiting 30 seconds for TestPyPI to propagate..."
+          sleep 30
 
       - name: Setup clean Python env and install package from TestPyPI
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.TEST_PYPI_SKIP != 'true'
         run: |
           python -m venv venv_test
           source venv_test/bin/activate
           python -m pip install --upgrade pip
-          echo "Installing vyte==$VERSION from TestPyPI"
+          echo "📥 Installing vyte==$VERSION from TestPyPI"
           pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple vyte==$VERSION
 
       - name: Basic CLI smoke tests
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.TEST_PYPI_SKIP != 'true'
         run: |
           source venv_test/bin/activate
           set -e
+          
+          echo "🧪 Running smoke tests..."
           vyte --version
           vyte --help
-          # create a temporary directory and generate a project non-interactively
+          
+          # Create a temporary directory and generate a project non-interactively
           TMPDIR=$(mktemp -d)
           cd "$TMPDIR"
           vyte create --no-interactive --name ci_test --framework FastAPI --orm SQLAlchemy --database SQLite
+          
           if [ ! -d ci_test ]; then
-            echo "Generated project folder not found"; exit 2
+            echo "❌ Generated project folder not found"
+            exit 2
           fi
-          echo "Files in generated project:"; ls -la ci_test | sed -n '1,200p'
+          
+          echo "✅ Project generated successfully"
+          echo "📁 Files in generated project:"
+          ls -la ci_test | head -n 50
+
+      - name: Upload build artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-packages
+          path: dist/
+          retention-days: 7
 
       - name: Cleanup test env
         if: always()
@@ -79,5 +110,5 @@ PY
 
 
 # Notes:
-# - Add repository secret TEST_PYPI_API_TOKEN with a TestPyPI API token (recommended) before enabling this workflow.
-# - You can skip the upload step by setting repository variable TEST_PYPI_SKIP=true for debugging the build/test parts only.
+# - Can skip the upload/test steps by setting repository variable TEST_PYPI_SKIP=true.
+# - The upload only runs on pushes to main branch, not on PRs.
