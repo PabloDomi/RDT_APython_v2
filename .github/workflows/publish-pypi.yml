@@ -145,6 +145,7 @@ jobs:
         run: rm -rf venv_test_publish || true
 
 # Notes:
+# - Change version in pyproject.toml before creating the tag, making sure it matches the tag.
 # - This workflow will run only when push a Git tag that starts with 'v', for example:
 #     git tag -a v2.0.3 -m "Release v2.0.3"
 #     git push origin v2.0.3
