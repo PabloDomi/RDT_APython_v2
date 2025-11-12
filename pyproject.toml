@@ -1,6 +1,6 @@
 [project]
 name = "vyte"
-version = "2.0.2"
+version = "2.0.3"
 description = "Professional API project generator for Python - Flask, FastAPI, Django-Rest"
 readme = "README.md"
 requires-python = ">=3.11,<4.0"
@@ -48,7 +48,8 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 packages = [ { include = "vyte" } ]
-include = [ { path = "templates" }, { path = "vyte/templates" } ]
+# Ensure only package-internal templates are included in built distributions
+include = [ { path = "vyte/templates" } ]
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.3"
