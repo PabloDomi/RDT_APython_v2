@@ -3,7 +3,7 @@ name = "vyte"
 version = "2.0.3"
 description = "Professional API project generator for Python - Flask, FastAPI, Django-Rest"
 readme = "README.md"
-requires-python = ">=3.11,<=3.13"
+requires-python = ">=3.11,<3.14"
 authors = [ { name = "PabloDomi", email = "Domi@usal.es" } ]
 license = "MIT"
 keywords = ["api", "generator", "flask", "fastapi", "django", "scaffolding", "boilerplate"]
