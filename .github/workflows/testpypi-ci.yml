@@ -57,20 +57,30 @@ jobs:
           echo "📤 Uploading version $VERSION to TestPyPI..."
           python -m twine upload --repository testpypi dist/* --verbose --skip-existing
 
-      - name: Wait for TestPyPI propagation
+      - name: Install package from TestPyPI with retries
         if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.TEST_PYPI_SKIP != 'true'
         run: |
-          echo "⏳ Waiting 30 seconds for TestPyPI to propagate..."
-          sleep 30
-
-      - name: Setup clean Python env and install package from TestPyPI
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.TEST_PYPI_SKIP != 'true'
-        run: |
+          # Create and activate a clean venv
           python -m venv venv_test
           source venv_test/bin/activate
           python -m pip install --upgrade pip
-          echo "📥 Installing vyte==$VERSION from TestPyPI"
-          pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple vyte==$VERSION
+
+          echo "📥 Installing vyte==$VERSION from TestPyPI (with retries)"
+
+          # Try installing several times to allow TestPyPI index propagation.
+          for i in 1 2 3 4 5 6; do
+            if pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple vyte==$VERSION; then
+              echo "✅ Installed vyte==$VERSION from TestPyPI"
+              break
+            else
+              echo "Attempt $i to install vyte==$VERSION failed; retrying after $((i*10))s..."
+              sleep $((i*10))
+            fi
+            if [ "$i" -eq 6 ]; then
+              echo "❌ Failed to install vyte==$VERSION from TestPyPI after $i attempts"
+              exit 1
+            fi
+          done
 
       - name: Basic CLI smoke tests
         if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.TEST_PYPI_SKIP != 'true'
