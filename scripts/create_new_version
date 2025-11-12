@@ -1,0 +1,131 @@
+#!/usr/bin/env bash
+# Create a new version: update pyproject.toml, commit, tag and optionally push.
+# Usage: ./create_new_version 2.0.4 [--no-push] [--sign]
+
+set -euo pipefail
+
+usage() {
+  cat <<EOF
+Usage: $0 VERSION [--no-push] [--sign] [--dry-run]
+
+Example:
+  $0 2.0.4         # update pyproject.toml, commit, tag v2.0.4, push commit+tag
+  $0 2.0.4 --no-push  # do everything except pushing to remote
+  $0 2.0.4 --sign     # create a signed tag (gpg) if available
+  $0 2.0.4 --dry-run  # print actions without executing
+EOF
+}
+
+if [ "$#" -lt 1 ]; then
+  usage
+  exit 2
+fi
+
+VERSION="$1"
+shift || true
+
+NO_PUSH=0
+SIGN_TAG=0
+DRY_RUN=0
+
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --no-push) NO_PUSH=1 ;; 
+    --sign) SIGN_TAG=1 ;; 
+    --dry-run) DRY_RUN=1 ;;
+    -h|--help) usage; exit 0 ;;
+    *) echo "Unknown option: $1"; usage; exit 2 ;;
+  esac
+  shift
+done
+
+if ! echo "$VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+([.-].*)?$'; then
+  echo "Version must look like MAJOR.MINOR.PATCH, got: $VERSION"
+  exit 2
+fi
+
+PROJECT_FILE="../pyproject.toml"
+
+if [ ! -f "$PROJECT_FILE" ]; then
+  echo "Error: $PROJECT_FILE not found in $(pwd)"
+  exit 2
+fi
+
+# Ensure git working tree is clean
+if [ -n "$(git status --porcelain 2>/dev/null)" ]; then
+  echo "Git working tree is not clean. Please commit or stash changes first."
+  git status --porcelain
+  exit 1
+fi
+
+echo "Preparing to bump version to $VERSION"
+
+TMPFILE="${PROJECT_FILE}.tmp"
+BACKUP="${PROJECT_FILE}.bak"
+
+echo "Backing up $PROJECT_FILE -> $BACKUP"
+cp "$PROJECT_FILE" "$BACKUP"
+
+echo "Updating version in $PROJECT_FILE"
+# Replace the first occurrence of 'version = "..."' in the [project] table
+awk -v ver="$VERSION" '
+  BEGIN{inproj=0}
+  /^\[project\]/ { inproj=1; print; next }
+  /^\[.*\]/ && inproj==1 { inproj=0; print; next }
+  { if(inproj==1 && $0 ~ /^\s*version\s*=\s*"/){ print "version = \"" ver "\""; next } print }
+' "$PROJECT_FILE" > "$TMPFILE"
+
+mv "$TMPFILE" "$PROJECT_FILE"
+
+echo "New version written to $PROJECT_FILE"
+
+GIT_COMMIT_MSG="Bump version to $VERSION"
+
+echo "Staging $PROJECT_FILE"
+if [ "$DRY_RUN" -eq 1 ]; then
+  echo "DRY RUN: git add $PROJECT_FILE"
+else
+  git add "$PROJECT_FILE"
+fi
+
+echo "Creating commit"
+if [ "$DRY_RUN" -eq 1 ]; then
+  echo "DRY RUN: git commit -m \"$GIT_COMMIT_MSG\""
+else
+  git commit -m "$GIT_COMMIT_MSG"
+fi
+
+TAG_NAME="v$VERSION"
+TAG_MSG="Release $TAG_NAME"
+
+echo "Creating tag $TAG_NAME"
+if [ "$DRY_RUN" -eq 1 ]; then
+  if [ "$SIGN_TAG" -eq 1 ]; then
+    echo "DRY RUN: git tag -s $TAG_NAME -m \"$TAG_MSG\""
+  else
+    echo "DRY RUN: git tag -a $TAG_NAME -m \"$TAG_MSG\""
+  fi
+else
+  if [ "$SIGN_TAG" -eq 1 ]; then
+    git tag -s "$TAG_NAME" -m "$TAG_MSG"
+  else
+    git tag -a "$TAG_NAME" -m "$TAG_MSG"
+  fi
+fi
+
+if [ "$NO_PUSH" -eq 1 ]; then
+  echo "--no-push given: skipping git push"
+  echo "Done. Remember to push when ready: git push origin HEAD && git push origin $TAG_NAME"
+  exit 0
+fi
+
+echo "Pushing commit and tag to origin"
+if [ "$DRY_RUN" -eq 1 ]; then
+  echo "DRY RUN: git push origin HEAD"
+  echo "DRY RUN: git push origin $TAG_NAME"
+else
+  git push origin HEAD
+  git push origin "$TAG_NAME"
+fi
+
+echo "Done. Version bumped to $VERSION and tag $TAG_NAME created/pushed."
