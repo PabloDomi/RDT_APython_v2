@@ -1418,5 +1418,5 @@ dev = ["pytest", "pytest-cov"]
 
 [metadata]
 lock-version = "2.1"
-python-versions = ">=3.11,<=3.13"
-content-hash = "2efe0182325628bdf20202b33551e6d28bc834c4b6e8fb3ca78abb0d99a07996"
+python-versions = ">=3.11,<3.14"
+content-hash = "6965d39c615fa6da45138f3a3e64874fce4c00cf17c2f6aa59e278288b84eeea"
