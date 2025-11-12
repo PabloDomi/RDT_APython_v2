@@ -1,0 +1,175 @@
+name: Publish to PyPI on tag
+
+on:
+  push:
+    # Trigger only for tags that start with 'v', e.g. v1.2.3
+    tags: ['v*']
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write  # Needed for trusted publishing (opcional pero recomendado)
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python 3.12
+        uses: actions/setup-python@v5  # ← Actualizado de v4 a v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'  # ← Añadido cache
+
+      - name: Install build tools
+        run: python -m pip install --upgrade pip build twine
+
+      - name: Read project version
+        id: read_version
+        run: |
+          python - <<'PY' > /tmp/pyproject_version.txt
+          import tomllib
+          with open('pyproject.toml', 'rb') as f:
+              data = tomllib.load(f)
+              print(data['project']['version'])
+          PY
+          VERSION=$(cat /tmp/pyproject_version.txt)
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "📦 Package version: $VERSION"
+
+      - name: Verify tag matches version
+        run: |
+          TAG_VERSION="${GITHUB_REF#refs/tags/v}"
+          echo "🏷️ Git tag version: $TAG_VERSION"
+          echo "📦 Package version: $VERSION"
+          if [ "$TAG_VERSION" != "$VERSION" ]; then
+            echo "❌ Error: Git tag ($TAG_VERSION) does not match package version ($VERSION)"
+            exit 1
+          fi
+          echo "✅ Tag and version match!"
+
+      - name: Build distributions
+        run: python -m build
+
+      - name: Twine check
+        run: python -m twine check dist/*
+
+      - name: Upload to PyPI
+        env:
+          TWINE_USERNAME: "__token__"
+          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+        run: |
+          echo "📤 Uploading version $VERSION to PyPI..."
+          python -m twine upload --repository pypi dist/* --verbose
+
+      - name: Wait for PyPI propagation
+        run: |
+          echo "⏳ Waiting 60 seconds for PyPI to propagate the package..."
+          sleep 60
+
+      - name: Smoke test install from PyPI
+        run: |
+          echo "🧪 Testing installation from PyPI..."
+          # Create a clean venv and attempt to install the just-published version
+          python -m venv venv_test_publish
+          source venv_test_publish/bin/activate
+          python -m pip install --upgrade pip
+          
+          # Retry logic for PyPI propagation
+          for i in {1..5}; do
+            echo "📥 Attempt $i: Installing vyte==$VERSION from PyPI"
+            if pip install vyte==$VERSION; then
+              echo "✅ Package installed successfully"
+              break
+            else
+              if [ $i -eq 5 ]; then
+                echo "❌ Failed to install after 5 attempts"
+                exit 1
+              fi
+              echo "⏳ Waiting 30 seconds before retry..."
+              sleep 30
+            fi
+          done
+          
+          echo "🧪 Running smoke tests..."
+          vyte --version
+          vyte --help
+          
+          # Try a non-interactive project creation
+          TMPDIR=$(mktemp -d)
+          cd "$TMPDIR"
+          vyte create --no-interactive --name ci_publish_test --framework FastAPI --orm SQLAlchemy --database SQLite
+          
+          if [ ! -d ci_publish_test ]; then
+            echo "❌ Generated project folder not found"
+            exit 2
+          fi
+          
+          echo "✅ Smoke tests passed!"
+          echo "📁 Generated files:"
+          ls -la ci_publish_test | head -n 20
+
+      - name: Upload build artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-packages-${{ env.VERSION }}
+          path: dist/
+          retention-days: 90  # Guardar por 90 días para releases
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dist/*
+          body: |
+            ## Release ${{ env.VERSION }}
+            
+            ### Installation
+```bash
+            pip install vyte==${{ env.VERSION }}
+```
+            
+            ### PyPI
+            https://pypi.org/project/vyte/${{ env.VERSION }}/
+            
+            ### What's Changed
+            See the [CHANGELOG](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md) for details.
+          draft: false
+          prerelease: false
+
+      - name: Cleanup
+        if: always()
+        run: rm -rf venv_test_publish || true
+
+  notify-success:
+    name: Notify successful release
+    needs: publish
+    if: success()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Success notification
+        run: |
+          echo "✅ Successfully published to PyPI!"
+          echo "🎉 Version: ${{ needs.publish.outputs.version }}"
+          echo "📦 Package: https://pypi.org/project/vyte/"
+
+  notify-failure:
+    name: Notify failed release
+    needs: publish
+    if: failure()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Failure notification
+        run: |
+          echo "❌ Failed to publish to PyPI"
+          echo "Check the workflow run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+# Notes:
+# - Create a PyPI API token at https://pypi.org/manage/account/#api-tokens
+# - Add it to the repository Secrets as PYPI_API_TOKEN (Settings → Secrets and variables → Actions → New repository secret)
+# - This workflow will run only when you push a Git tag that starts with 'v', for example:
+#     git tag -a v2.0.3 -m "Release v2.0.3"
+#     git push origin v2.0.3
+# - Alternative: Use GitHub's trusted publishing instead of API tokens (more secure)
