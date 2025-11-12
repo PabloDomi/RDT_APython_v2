@@ -127,15 +127,14 @@ jobs:
           files: dist/*
           body: |
             ## Release ${{ env.VERSION }}
-            
+
             ### Installation
-```bash
-            pip install vyte==${{ env.VERSION }}
-```
-            
+
+                pip install vyte==${{ env.VERSION }}
+
             ### PyPI
             https://pypi.org/project/vyte/${{ env.VERSION }}/
-            
+
             ### What's Changed
             See the [CHANGELOG](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md) for details.
           draft: false
