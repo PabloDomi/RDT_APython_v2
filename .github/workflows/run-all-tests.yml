@@ -1,0 +1,91 @@
+name: Run all tests (unit + integration + slow)
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch: {}
+
+jobs:
+  test-matrix:
+    name: Run full test suite on ${{ matrix.os }} / Python ${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ['3.10', '3.11', '3.12']
+    timeout-minutes: 60
+    concurrency:
+      group: run-all-tests-${{ matrix.os }}-${{ matrix.python-version }}
+      cancel-in-progress: true
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+
+      - name: Cache Poetry dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pypoetry
+            .venv
+          key: ${{ runner.os }}-poetry-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-poetry-${{ matrix.python-version }}-
+
+      - name: Show Python and pip versions
+        run: |
+          python --version
+          pip --version
+
+      - name: Install Poetry
+        shell: bash
+        run: |
+          python -m pip install --upgrade pip
+          pip install poetry
+
+      - name: Configure Poetry
+        shell: bash
+        run: |
+          poetry config virtualenvs.create true
+          poetry config virtualenvs.in-project true
+
+      - name: Generate lock file if missing
+        shell: bash
+        run: |
+          if [ ! -f poetry.lock ]; then
+            echo "⚠️ poetry.lock not found, generating..."
+            poetry lock --no-update
+          else
+            echo "✅ poetry.lock found"
+          fi
+
+      - name: Install dependencies (default + dev)
+        shell: bash
+        run: |
+          poetry install --with dev --no-interaction
+
+      - name: Run full test suite
+        shell: bash
+        run: |
+          echo "🧪 Running full test suite (pytest -q) on ${{ matrix.os }} with Python ${{ matrix.python-version }}"
+          # Run every test present (unit, integration, slow) — equivalent to `pytest -q` locally
+          poetry run pytest -q
+
+      - name: Upload test artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.os }}-py${{ matrix.python-version }}
+          path: |
+            .pytest_cache/
+            test-results/
+          retention-days: 7
