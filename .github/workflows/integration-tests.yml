@@ -68,10 +68,10 @@ jobs:
             echo "✅ poetry.lock found"
           fi
 
-      - name: Install dependencies
+      - name: Install dependencies with integration test deps
         shell: bash
         run: |
-          poetry install --with dev --no-interaction
+          poetry install --with dev,integration --no-interaction
 
       - name: Install SQLAlchemy (for DB-backed integration tests)
         shell: bash
