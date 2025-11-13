@@ -26,7 +26,7 @@ def create_app(config_name=None):
     migration.init_app(app, db)
     {% if auth_enabled %}
     jwt.init_app(app)
-    
+
     # JWT Configuration
     @jwt.user_identity_loader
     def user_identity_lookup(user):

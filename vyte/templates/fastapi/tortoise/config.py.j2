@@ -10,19 +10,19 @@ from pydantic import Field, field_validator
 
 class Settings(BaseSettings):
     """Application settings"""
-    
+
     # Application
     APP_NAME: str = "{{ name | title_case }}"
     APP_VERSION: str = "1.0.0"
     DEBUG: bool = Field(default=False, validation_alias="DEBUG")
     ENVIRONMENT: str = Field(default="development", validation_alias="ENVIRONMENT")
-    
+
     # Database
     DATABASE_URL: str = Field(
         default="sqlite://{{ name | snake_case }}.db",
         validation_alias="DATABASE_URL"
     )
-    
+
 {% if auth_enabled -%}
     # JWT Authentication
     JWT_SECRET_KEY: str = Field(
@@ -31,7 +31,7 @@ class Settings(BaseSettings):
     )
     JWT_ALGORITHM: str = Field(default="HS256", validation_alias="JWT_ALGORITHM")
     JWT_ACCESS_TOKEN_EXPIRES: int = Field(default=30, validation_alias="JWT_ACCESS_TOKEN_EXPIRES")
-    
+
 {% endif -%}
     # CORS
     CORS_ORIGINS: list[str] = Field(
@@ -41,23 +41,23 @@ class Settings(BaseSettings):
     CORS_ALLOW_CREDENTIALS: bool = True
     CORS_ALLOW_METHODS: list[str] = ["*"]
     CORS_ALLOW_HEADERS: list[str] = ["*"]
-    
+
     # API
     API_PREFIX: str = "/api"
     DOCS_URL: Optional[str] = "/docs"
     REDOC_URL: Optional[str] = "/redoc"
     OPENAPI_URL: Optional[str] = "/openapi.json"
-    
+
     # Logging
     LOG_LEVEL: str = Field(default="INFO", validation_alias="LOG_LEVEL")
-    
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
         case_sensitive=True,
         extra="ignore"
     )
-    
+
     @field_validator("CORS_ORIGINS", mode="before")
     @classmethod
     def parse_cors_origins(cls, v):
@@ -66,12 +66,12 @@ class Settings(BaseSettings):
             # Handle comma-separated string from .env
             return [origin.strip() for origin in v.split(",")]
         return v
-    
+
     @property
     def is_production(self) -> bool:
         """Check if running in production"""
         return (self.ENVIRONMENT).lower() == "production"
-    
+
     @property
     def is_development(self) -> bool:
         """Check if running in development"""
@@ -89,7 +89,7 @@ settings = Settings()
 def get_tortoise_config() -> dict:
     """
     Get Tortoise ORM configuration (for application use)
-    
+
     Returns:
         dict: Configuration dictionary for Tortoise ORM
     """

@@ -6,7 +6,7 @@ testpaths = tests
 python_files = test_*.py
 python_classes = Test*
 python_functions = test_*
-addopts = 
+addopts =
     -v
     --tb=short
     --durations=10
@@ -22,7 +22,7 @@ markers =
     integration: Integration tests (use production DB)
     database_specific: Tests requiring production DB features
     slow: Slow tests that can be skipped in development
-    
+
 # Custom test commands:
 # pytest -m unit              # Fast tests only (SQLite)
 # pytest -m integration       # Realistic tests (Production DB)

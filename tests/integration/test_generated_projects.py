@@ -3,25 +3,28 @@
 Integration tests for generated projects
 """
 import os
-from pathlib import Path
 import subprocess
 import tempfile
-import shutil
+from pathlib import Path
+
 import pytest
 
+from tests.integration._utils import safe_rmtree
 from vyte.core.config import ProjectConfig
 from vyte.core.generator import ProjectGenerator
-from tests.integration._utils import safe_rmtree
 
 
 @pytest.mark.integration
-@pytest.mark.parametrize("framework,orm,database", [
-    ("Flask-Restx", "SQLAlchemy", "PostgreSQL"),
-    ("Flask-Restx", "SQLAlchemy", "SQLite"),
-    ("Flask-Restx", "Peewee", "SQLite"),
-    ("FastAPI", "SQLAlchemy", "PostgreSQL"),
-    ("FastAPI", "TortoiseORM", "PostgreSQL"),
-])
+@pytest.mark.parametrize(
+    "framework,orm,database",
+    [
+        ("Flask-Restx", "SQLAlchemy", "PostgreSQL"),
+        ("Flask-Restx", "SQLAlchemy", "SQLite"),
+        ("Flask-Restx", "Peewee", "SQLite"),
+        ("FastAPI", "SQLAlchemy", "PostgreSQL"),
+        ("FastAPI", "TortoiseORM", "PostgreSQL"),
+    ],
+)
 def test_generated_project_structure(framework, orm, database):
     """Test that generated projects have correct structure"""
     temp_dir = Path(tempfile.mkdtemp())
@@ -49,35 +52,34 @@ def test_generated_project_structure(framework, orm, database):
 
             # Verify structure
             assert project_path.exists()
-            assert (project_path / 'src').is_dir()
-            assert (project_path / 'src' / '__init__.py').exists()
-            assert (project_path / 'src' / 'models').is_dir()
-            assert (project_path / 'src' / 'routes').is_dir()
-            assert (project_path / 'src' / 'config').is_dir()
-            assert (project_path / 'requirements.txt').exists()
-            assert (project_path / 'README.md').exists()
-            assert (project_path / '.gitignore').exists()
-            assert (project_path / '.env.example').exists()
+            assert (project_path / "src").is_dir()
+            assert (project_path / "src" / "__init__.py").exists()
+            assert (project_path / "src" / "models").is_dir()
+            assert (project_path / "src" / "routes").is_dir()
+            assert (project_path / "src" / "config").is_dir()
+            assert (project_path / "requirements.txt").exists()
+            assert (project_path / "README.md").exists()
+            assert (project_path / ".gitignore").exists()
+            assert (project_path / ".env.example").exists()
 
             # Verify Docker files
-            assert (project_path / 'Dockerfile').exists()
-            assert (project_path / 'docker-compose.yml').exists()
+            assert (project_path / "Dockerfile").exists()
+            assert (project_path / "docker-compose.yml").exists()
 
             # Verify test files
-            assert (project_path / 'tests').is_dir()
-            assert (project_path / 'pytest.ini').exists()
+            assert (project_path / "tests").is_dir()
+            assert (project_path / "pytest.ini").exists()
 
             # Verify Python syntax
-            for py_file in project_path.rglob('*.py'):
+            for py_file in project_path.rglob("*.py"):
                 result = subprocess.run(
-                    ['python', '-m', 'py_compile', str(py_file)],
-                    capture_output=True,
-                    check=False
+                    ["python", "-m", "py_compile", str(py_file)], capture_output=True, check=False
                 )
                 if result.returncode != 0:
                     print(f"DEBUG: Compilation error in {py_file}:\n{result.stderr.decode()})")
-                assert result.returncode == 0, \
-                    f"Syntax error in {py_file}:\n{result.stderr.decode()}"
+                assert (
+                    result.returncode == 0
+                ), f"Syntax error in {py_file}:\n{result.stderr.decode()}"
 
         finally:
             os.chdir(original_dir)
@@ -113,27 +115,25 @@ def test_generated_project_installs():
             project_path = generator.generate(config)
 
             # Create virtual environment
-            venv_path = project_path / 'venv'
-            subprocess.run(
-                ['python', '-m', 'venv', str(venv_path)],
-                check=True
-            )
+            venv_path = project_path / "venv"
+            subprocess.run(["python", "-m", "venv", str(venv_path)], check=True)
 
             # Install dependencies
-            pip_path = venv_path / 'bin' / 'pip'
+            pip_path = venv_path / "bin" / "pip"
             if not pip_path.exists():
-                pip_path = venv_path / 'Scripts' / 'pip.exe'
+                pip_path = venv_path / "Scripts" / "pip.exe"
 
             result = subprocess.run(
-                [str(pip_path), 'install', '-r', 'requirements.txt'],
+                [str(pip_path), "install", "-r", "requirements.txt"],
                 cwd=project_path,
                 capture_output=True,
                 timeout=300,
-                check=False
+                check=False,
             )
 
-            assert result.returncode == 0, \
-                f"Failed to install dependencies:\n{result.stderr.decode()}"
+            assert (
+                result.returncode == 0
+            ), f"Failed to install dependencies:\n{result.stderr.decode()}"
 
         finally:
             os.chdir(original_dir)

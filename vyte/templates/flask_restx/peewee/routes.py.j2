@@ -56,11 +56,11 @@ class Register(Resource):
     def post(self):
         """Register new user"""
         data = request.json
-        
+
         # Check if user exists
         if User.select().where(User.username == data['username']).exists():
             user_ns.abort(400, 'Username exists')
-        
+
         if User.select().where(User.email == data['email']).exists():
             user_ns.abort(400, 'Email exists')
 
@@ -77,7 +77,7 @@ class Register(Resource):
         is_valid, message = password_validator.validate(data['password'])
         if not is_valid:
             user_ns.abort(400, f'Invalid password: {message}')
-        
+
         try:
             # Create user with password
             user = User.create_user(
@@ -87,7 +87,7 @@ class Register(Resource):
             )
         except IntegrityError as e:
             user_ns.abort(400, f'Database error: {str(e)}')
-        
+
         return user.to_dict(), 201
 
 
@@ -97,15 +97,15 @@ class Login(Resource):
     def post(self):
         """Login"""
         data = request.json
-        
+
         try:
             user = User.get(User.username == data['username'])
         except DoesNotExist:
             user_ns.abort(401, 'Invalid credentials')
-        
+
         if not user.check_password(data['password']):
             user_ns.abort(401, 'Invalid credentials')
-        
+
         access_token = create_access_token(identity=user.id)
         return {'access_token': access_token, 'user': user.to_dict()}, 200
 
@@ -138,13 +138,13 @@ class UserList(Resource):
         """Get all users"""
         users = User.select()
         return [user.to_dict() for user in users]
-    
+
     @user_ns.expect(user_input)
     @user_ns.marshal_with(user_model, code=201)
     def post(self):
         """Create user"""
         data = user_ns.payload
-        
+
         user = User.create(
             username=data['username'],
             email=data['email']

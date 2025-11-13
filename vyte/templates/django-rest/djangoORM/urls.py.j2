@@ -41,7 +41,7 @@ auth_urlpatterns = [
     path('login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('verify/', TokenVerifyView.as_view(), name='token_verify'),
-    
+
     # User registration and management
     path('register/', UserRegisterView.as_view(), name='user-register'),
     path('change-password/', ChangePasswordView.as_view(), name='user-change-password'),
@@ -56,25 +56,25 @@ urlpatterns = [
     # Health check and API root
     path('', health_check, name='health-check'),
     path('api/', api_root, name='api-root'),
-    
+
     {% if auth_enabled -%}
     # Authentication endpoints
     path('api/auth/', include(auth_urlpatterns)),
     {% endif -%}
-    
+
     # API endpoints (from router)
     path('api/', include(router.urls)),
 
     # ============================================================================
     # API DOCUMENTATION (OpenAPI/Swagger)
     # ============================================================================
-    
+
     # OpenAPI schema
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
-    
+
     # Swagger UI
     path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
-    
+
     # ReDoc UI (alternative documentation)
     path('api/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
 ]

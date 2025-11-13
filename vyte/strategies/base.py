@@ -1,8 +1,10 @@
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Dict, Any
+from typing import Any
+
 from ..core.config import ProjectConfig
 from ..core.renderer import TemplateRenderer
+
 
 class BaseStrategy(ABC):
     """
@@ -39,6 +41,6 @@ class BaseStrategy(ABC):
             project_path: Root path of the project
         """
 
-    def get_context(self) -> Dict[str, Any]:
+    def get_context(self) -> dict[str, Any]:
         """Get template context with additional data"""
         return self.context.copy()

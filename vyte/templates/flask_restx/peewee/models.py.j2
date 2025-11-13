@@ -23,13 +23,13 @@ class User(BaseModel):
 {% if auth_enabled %}
     password_hash = CharField(max_length=255)
     is_active = BooleanField(default=True)
-    
+
     @classmethod
     def create_user(cls, username: str, email: str, password: str, **kwargs):
         """
         Helper method to create user with password.
         Use this instead of User.create() when you need to set a password.
-        
+
         Example:
             user = User.create_user(
                 username='john',
@@ -44,11 +44,11 @@ class User(BaseModel):
             password_hash=password_hash,
             **kwargs
         )
-    
+
     def set_password(self, password: str) -> None:
         """Hash and set password"""
         self.password_hash = generate_password_hash(password, method='pbkdf2:sha256')
-    
+
     def check_password(self, password: str) -> bool:
         """Verify password against hash"""
         return check_password_hash(self.password_hash, password)
@@ -60,7 +60,7 @@ class User(BaseModel):
         """
         Helper method to create user with password.
         Use this instead of User.create() when you need to set a password.
-        
+
         Example:
             user = User.create_user(
                 username='john',
@@ -75,13 +75,13 @@ class User(BaseModel):
             **kwargs
         )
 {% endif %}
-    
+
     class Meta:
         table_name = 'users'
-    
+
     def __repr__(self) -> str:
         return f"<User(id={self.id}, username='{self.username}')>"
-    
+
     def to_dict(self) -> dict:
         """Convert model to dictionary"""
         return {
@@ -99,13 +99,13 @@ class Item(BaseModel):
     title = CharField(max_length=100)
     description = TextField(null=True)
     owner = ForeignKeyField(User, backref='items', on_delete='CASCADE')
-    
+
     class Meta:
         table_name = 'items'
-    
+
     def __repr__(self) -> str:
         return f"<Item(id={self.id}, title='{self.title}')>"
-    
+
     def to_dict(self) -> dict:
         """Convert model to dictionary"""
         return {

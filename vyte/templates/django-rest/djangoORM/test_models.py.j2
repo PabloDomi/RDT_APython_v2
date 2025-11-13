@@ -16,7 +16,7 @@ from {{ name | snake_case }}.models import User, Item
 @pytest.mark.django_db
 class TestUserModel:
     """Test User model functionality"""
-    
+
 {%- if auth_enabled %}
 
     @pytest.mark.unit
@@ -30,7 +30,7 @@ class TestUserModel:
         assert user.is_active is True
         assert user.is_staff is False
         assert user.is_superuser is False
-    
+
     @pytest.mark.unit
     def test_create_user_normalizes_email(self, user_model):
         """Test email normalization (lowercase domain)"""
@@ -39,13 +39,13 @@ class TestUserModel:
             password='TestPass123!'
         )
         assert user.email == 'test@example.com'
-    
+
     @pytest.mark.unit
     def test_create_user_without_email_raises_error(self, user_model):
         """Test creating user without email raises ValueError"""
         with pytest.raises(ValueError, match='Users must have an email address'):
             user_model.objects.create_user(email='', password='TestPass123!')
-    
+
     @pytest.mark.unit
     def test_create_superuser(self, user_model):
         """Test creating superuser"""
@@ -56,7 +56,7 @@ class TestUserModel:
         assert admin.is_staff is True
         assert admin.is_superuser is True
         assert admin.is_active is True
-    
+
     @pytest.mark.unit
     def test_password_hashing(self, user_model):
         """Test password is properly hashed"""
@@ -67,24 +67,24 @@ class TestUserModel:
         # Password should be hashed, not stored in plain text
         assert user.password != 'Secret123!'
         assert user.password.startswith('pbkdf2_sha256$')
-    
+
     @pytest.mark.unit
     def test_check_password(self, test_user):
         """Test password checking"""
         assert test_user.check_password(test_user.plain_password)
         assert not test_user.check_password('WrongPassword')
         assert not test_user.check_password('')
-    
+
     @pytest.mark.unit
     def test_set_password(self, test_user):
         """Test changing password"""
         new_password = 'NewSecurePass123!'
         test_user.set_password(new_password)
         test_user.save()
-        
+
         assert test_user.check_password(new_password)
         assert not test_user.check_password(test_user.plain_password)
-    
+
     @pytest.mark.unit
     def test_email_unique_constraint(self, user_model, test_user):
         """Test email uniqueness is enforced"""
@@ -93,7 +93,7 @@ class TestUserModel:
                 email=test_user.email,
                 password='AnotherPass123!'
             )
-    
+
     @pytest.mark.unit
     def test_get_full_name(self, user_model):
         """Test get_full_name method"""
@@ -104,15 +104,15 @@ class TestUserModel:
             last_name='Doe'
         )
         assert user.get_full_name() == 'John Doe'
-        
+
         # Test with only first name
         user.last_name = ''
         assert user.get_full_name() == 'John'
-        
+
         # Test with no names
         user.first_name = ''
         assert user.get_full_name() == 'test@example.com'
-    
+
     @pytest.mark.unit
     def test_get_short_name(self, user_model):
         """Test get_short_name method"""
@@ -122,27 +122,27 @@ class TestUserModel:
             first_name='John'
         )
         assert user.get_short_name() == 'John'
-        
+
         # Test without first name
         user.first_name = ''
         assert user.get_short_name() == 'test'
-    
+
     @pytest.mark.unit
     def test_user_str_representation(self, test_user):
         """Test __str__ method returns email"""
         assert str(test_user) == test_user.email
-    
+
     @pytest.mark.unit
     def test_username_field_is_email(self, user_model):
         """Test USERNAME_FIELD is set to email"""
         assert user_model.USERNAME_FIELD == 'email'
-    
+
     @pytest.mark.unit
     def test_user_timestamps(self, test_user):
         """Test user has timestamp fields"""
         assert test_user.date_joined is not None
         assert hasattr(test_user, 'last_login')
-    
+
     @pytest.mark.integration
     def test_user_items_relationship(self, test_user):
         """Test reverse relationship to items"""
@@ -156,11 +156,11 @@ class TestUserModel:
             description='Description 2',
             owner=test_user
         )
-        
+
         assert test_user.items.count() == 2
         assert item1 in test_user.items.all()
         assert item2 in test_user.items.all()
-    
+
     @pytest.mark.integration
     def test_user_cascade_delete_items(self, test_user):
         """Test deleting user cascades to their items"""
@@ -170,11 +170,11 @@ class TestUserModel:
             owner=test_user
         )
         item_id = item.id
-        
+
         test_user.delete()
-        
+
         assert not Item.objects.filter(id=item_id).exists()
-    
+
 {%- else %}
     @pytest.mark.unit
     def test_create_user_basic(self):
@@ -186,15 +186,15 @@ class TestUserModel:
         assert user.email == 'user@example.com'
         assert user.full_name == 'Test User'
         assert user.is_active is True
-    
+
     @pytest.mark.unit
     def test_email_unique_constraint(self):
         """Test email uniqueness is enforced"""
         User.objects.create(email='test@example.com', full_name='User 1')
-        
+
         with pytest.raises(IntegrityError):
             User.objects.create(email='test@example.com', full_name='User 2')
-    
+
     @pytest.mark.unit
     def test_user_str_representation(self):
         """Test __str__ method"""
@@ -203,7 +203,7 @@ class TestUserModel:
             full_name='Test User'
         )
         assert str(user) == 'test@example.com'
-    
+
     @pytest.mark.unit
     def test_get_display_name(self):
         """Test get_display_name method"""
@@ -212,11 +212,11 @@ class TestUserModel:
             full_name='Test User'
         )
         assert user.get_display_name() == 'Test User'
-        
+
         # Test without full name
         user.full_name = ''
         assert user.get_display_name() == 'test@example.com'
-    
+
     @pytest.mark.unit
     def test_user_timestamps(self):
         """Test user has timestamp fields"""
@@ -226,7 +226,7 @@ class TestUserModel:
         )
         assert user.created_at is not None
         assert user.updated_at is not None
-    
+
     @pytest.mark.unit
     def test_timestamps_auto_update(self):
         """Test updated_at changes on save"""
@@ -235,13 +235,13 @@ class TestUserModel:
             full_name='Test User'
         )
         original_updated = user.updated_at
-        
+
         # Small delay and update
         import time
         time.sleep(0.01)
         user.full_name = 'Updated Name'
         user.save()
-        
+
         assert user.updated_at > original_updated
 {%- endif %}
 
@@ -253,7 +253,7 @@ class TestUserModel:
 @pytest.mark.django_db
 class TestItemModel:
     """Test Item model functionality"""
-    
+
 {%- if auth_enabled %}
 
     @pytest.mark.unit
@@ -268,7 +268,7 @@ class TestItemModel:
         assert item.description == 'Test Description'
         assert item.owner == test_user
         assert item.is_active is True
-    
+
     @pytest.mark.unit
     def test_item_requires_owner(self):
         """Test item requires an owner"""
@@ -277,7 +277,7 @@ class TestItemModel:
                 title='No Owner Item',
                 description='This should fail'
             )
-    
+
     @pytest.mark.unit
     def test_item_owner_relationship(self, test_user):
         """Test item belongs to user"""
@@ -287,7 +287,7 @@ class TestItemModel:
         )
         assert item.owner == test_user
         assert item in test_user.items.all()
-    
+
 {%- else %}
     @pytest.mark.unit
     def test_create_item_basic(self):
@@ -303,7 +303,7 @@ class TestItemModel:
         assert item.quantity == 10
         assert item.price == 19.99
         assert item.is_active is True
-    
+
     @pytest.mark.unit
     def test_item_default_values(self):
         """Test item default values"""
@@ -311,7 +311,7 @@ class TestItemModel:
         assert item.quantity == 0
         assert item.price == 0.00
         assert item.is_active is True
-    
+
     @pytest.mark.unit
     def test_item_quantity_validation(self):
         """Test quantity cannot be negative"""
@@ -322,7 +322,7 @@ class TestItemModel:
         )
         with pytest.raises(ValidationError):
             item.full_clean()
-    
+
     @pytest.mark.unit
     def test_item_price_validation(self):
         """Test price cannot be negative"""
@@ -333,7 +333,7 @@ class TestItemModel:
         )
         with pytest.raises(ValidationError):
             item.full_clean()
-    
+
     @pytest.mark.unit
     def test_total_value_property(self):
         """Test total_value calculated property"""
@@ -343,12 +343,12 @@ class TestItemModel:
             price=10.50
         )
         assert item.total_value == 52.50
-        
+
         # Test with zero values
         item.quantity = 0
         assert item.total_value == 0
 {%- endif %}
-    
+
     @pytest.mark.unit
     def test_item_str_representation(self{% if auth_enabled %}, test_user{% endif %}):
         """Test __str__ method returns title"""
@@ -361,7 +361,7 @@ class TestItemModel:
 {%- endif %}
         )
         assert str(item) == 'String Test Item'
-    
+
     @pytest.mark.unit
     def test_item_timestamps(self{% if auth_enabled %}, test_user{% endif %}):
         """Test item has timestamp fields"""
@@ -375,7 +375,7 @@ class TestItemModel:
         )
         assert item.created_at is not None
         assert item.updated_at is not None
-    
+
     @pytest.mark.unit
     def test_item_ordering(self{% if auth_enabled %}, test_user{% endif %}):
         """Test items ordered by created_at descending"""
@@ -395,12 +395,12 @@ class TestItemModel:
             quantity=2
 {%- endif %}
         )
-        
+
         items = list(Item.objects.all())
         assert items[0] == item1
         assert items[1] == item2
 
-    
+
 {%- if auth_enabled %}
 
     @pytest.mark.integration
@@ -408,40 +408,40 @@ class TestItemModel:
         """Test deleting owner cascades to items"""
         item1 = Item.objects.create(title='Item 1', owner=test_user)
         item2 = Item.objects.create(title='Item 2', owner=test_user)
-        
+
         item1_id = item1.id
         item2_id = item2.id
-        
+
         test_user.delete()
-        
+
         assert not Item.objects.filter(id=item1_id).exists()
         assert not Item.objects.filter(id=item2_id).exists()
-    
+
     @pytest.mark.integration
     def test_multiple_users_multiple_items(self, test_user, another_user):
         """Test multiple users can have items"""
         item1 = Item.objects.create(title='User1 Item', owner=test_user)
         item2 = Item.objects.create(title='User2 Item', owner=another_user)
-        
+
         assert test_user.items.count() == 1
         assert another_user.items.count() == 1
         assert item1.owner == test_user
         assert item2.owner == another_user
-    
+
     @pytest.mark.integration
     def test_filter_items_by_owner(self, test_user, another_user):
         """Test filtering items by owner"""
         Item.objects.create(title='Test User Item 1', owner=test_user)
         Item.objects.create(title='Test User Item 2', owner=test_user)
         Item.objects.create(title='Another User Item', owner=another_user)
-        
+
         test_user_items = Item.objects.filter(owner=test_user)
         assert test_user_items.count() == 2
-        
+
         another_user_items = Item.objects.filter(owner=another_user)
         assert another_user_items.count() == 1
 {%- endif %}
-    
+
     @pytest.mark.unit
     def test_item_title_required(self{% if auth_enabled %}, test_user{% endif %}):
         """Test item title is required"""
@@ -454,7 +454,7 @@ class TestItemModel:
                 quantity=5
 {%- endif %}
             )
-    
+
     @pytest.mark.unit
     def test_item_description_optional(self{% if auth_enabled %}, test_user{% endif %}):
         """Test item description is optional"""
@@ -467,7 +467,7 @@ class TestItemModel:
 {%- endif %}
         )
         assert item.description in ('', None)
-    
+
     @pytest.mark.unit
     def test_bulk_create_items(self{% if auth_enabled %}, test_user{% endif %}):
         """Test bulk creating items"""
@@ -484,10 +484,10 @@ class TestItemModel:
             for i in range(10)
         ]
         created_items = Item.objects.bulk_create(items)
-        
+
         assert len(created_items) == 10
         assert Item.objects.count() == 10
-    
+
     @pytest.mark.unit
     def test_update_item(self{% if auth_enabled %}, test_user{% endif %}):
         """Test updating item fields"""
@@ -501,11 +501,11 @@ class TestItemModel:
             price=10.00
 {%- endif %}
         )
-        
+
         item.title = 'Updated Title'
         item.description = 'Updated Description'
         item.save()
-        
+
         item.refresh_from_db()
         assert item.title == 'Updated Title'
         assert item.description == 'Updated Description'
@@ -518,16 +518,16 @@ class TestItemModel:
 @pytest.mark.django_db
 class TestModelIntegration:
     """Test model interactions and relationships"""
-    
+
 {%- if auth_enabled %}
 
     @pytest.mark.integration
     def test_query_optimization_select_related(self, test_user):
         """Test efficient querying with select_related"""
-        
+
         Item.objects.create(title='Item 1', owner=test_user)
         Item.objects.create(title='Item 2', owner=test_user)
-        
+
         # Test without select_related (should execute multiple queries)
         with override_settings(DEBUG=True):
             reset_queries()
@@ -535,7 +535,7 @@ class TestModelIntegration:
             for item in items:
                 _ = item.owner.email  # Triggers additional query for each item
             queries_without_select = len(connection.queries)
-        
+
         # Test with select_related (should execute fewer queries)
         with override_settings(DEBUG=True):
             reset_queries()
@@ -543,32 +543,32 @@ class TestModelIntegration:
             for item in items:
                 _ = item.owner.email  # No additional queries needed
             queries_with_select = len(connection.queries)
-        
+
         # With select_related should use fewer queries
         assert queries_with_select < queries_without_select
-    
+
     @pytest.mark.integration
     def test_aggregate_queries(self, test_user, another_user):
         """Test aggregate queries"""
         from django.db.models import Count
-        
+
         Item.objects.create(title='Item 1', owner=test_user)
         Item.objects.create(title='Item 2', owner=test_user)
         Item.objects.create(title='Item 3', owner=another_user)
-        
+
         users_with_counts = User.objects.annotate(
             item_count=Count('items')
         )
-        
+
         test_user_with_count = users_with_counts.get(pk=test_user.pk)
         assert test_user_with_count.item_count == 2
 {%- endif %}
-    
+
     @pytest.mark.slow
     def test_database_constraints(self{% if auth_enabled %}, test_user{% endif %}):
         """Test database-level constraints are enforced"""
         # Test unique constraint on User email
         User.objects.{% if auth_enabled %}create_user{% else %}create{% endif %}(email='unique@example.com'{% if auth_enabled %}, password='Pass123!'{% else %}, full_name='User'{% endif %})
-        
+
         with pytest.raises(IntegrityError):
             User.objects.{% if auth_enabled %}create_user{% else %}create{% endif %}(email='unique@example.com'{% if auth_enabled %}, password='Pass123!'{% else %}, full_name='User2'{% endif %})

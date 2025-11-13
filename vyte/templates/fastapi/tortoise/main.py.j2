@@ -21,9 +21,9 @@ async def lifespan(app: FastAPI):
     print("🚀 Starting up...")
     await init_db()
     print("✅ Database initialized")
-    
+
     yield
-    
+
     # Shutdown
     print("🔌 Shutting down...")
     await close_db()

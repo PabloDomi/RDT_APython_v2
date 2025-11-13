@@ -7,9 +7,9 @@ from pydantic import ValidationError
 
 from vyte.core.config import (
     ProjectConfig,
-    validate_combination,
     get_compatible_orms,
-    quick_validate
+    quick_validate,
+    validate_combination,
 )
 
 
@@ -60,8 +60,7 @@ def test_validate_combination():
     # Invalid combination
     is_valid, msg = validate_combination("Flask-Restx", "TortoiseORM")
     assert not is_valid
-    assert ("async" in msg.lower() and "sync" in msg.lower()) or \
-       "synchronous" in msg.lower()
+    assert ("async" in msg.lower() and "sync" in msg.lower()) or "synchronous" in msg.lower()
 
 
 def test_get_compatible_orms():
@@ -75,16 +74,12 @@ def test_get_compatible_orms():
 def test_quick_validate():
     """Test quick validation"""
     # Valid
-    is_valid, errors = quick_validate(
-        "Flask-Restx", "SQLAlchemy", "PostgreSQL", "test-api"
-    )
+    is_valid, errors = quick_validate("Flask-Restx", "SQLAlchemy", "PostgreSQL", "test-api")
     assert is_valid
     assert len(errors) == 0
 
     # Invalid - no name
-    is_valid, errors = quick_validate(
-        "Flask-Restx", "SQLAlchemy", "PostgreSQL", ""
-    )
+    is_valid, errors = quick_validate("Flask-Restx", "SQLAlchemy", "PostgreSQL", "")
     assert not is_valid
     assert len(errors) > 0
 

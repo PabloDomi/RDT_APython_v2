@@ -15,28 +15,28 @@ addopts =
     --tb=short
     --strict-markers
     --strict-config
-    
+
     # Django-specific
     --reuse-db
     --nomigrations
-    
+
     # Performance
     --maxfail=5
     --durations=10
-    
+
     # Warnings
     --disable-warnings
     -p no:warnings
-    
+
     # Coverage (uncomment to enable)
     # --cov={{ name }}
     # --cov-report=html
     # --cov-report=term-missing
     # --cov-fail-under=80
-    
+
     # Output formatting
     --color=yes
-    
+
 # Markers
 markers =
     unit: Fast unit tests with no external dependencies (deselect with '-m "not unit"')
@@ -90,7 +90,7 @@ filterwarnings =
 # -n auto
 
 # Collection
-norecursedirs = 
+norecursedirs =
     .git
     .tox
     dist
@@ -104,7 +104,7 @@ norecursedirs =
     migrations
 
 # Doctest options (if using doctests)
-doctest_optionflags = 
+doctest_optionflags =
     NORMALIZE_WHITESPACE
     IGNORE_EXCEPTION_DETAIL
     ELLIPSIS

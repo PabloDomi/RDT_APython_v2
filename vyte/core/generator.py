@@ -1,15 +1,17 @@
 """
 Main project generator using Strategy Pattern
 """
-from pathlib import Path
-from typing import Optional
+
 import shutil
-from .config import ProjectConfig
-from .renderer import TemplateRenderer, TemplateRegistry
-from .dependencies import DependencyManager
-from ..strategies.flask_restx import FlaskRestxStrategy
-from ..strategies.fastapi import FastAPIStrategy
+from pathlib import Path
+
+from ..exceptions import FileSystemError, GenerationError
 from ..strategies.django_rest import DjangoRestStrategy
+from ..strategies.fastapi import FastAPIStrategy
+from ..strategies.flask_restx import FlaskRestxStrategy
+from .config import ProjectConfig
+from .dependencies import DependencyManager
+from .renderer import TemplateRegistry, TemplateRenderer
 
 
 class ProjectGenerator:
@@ -20,12 +22,12 @@ class ProjectGenerator:
 
     # Strategy registry
     STRATEGIES = {
-        'Flask-Restx': FlaskRestxStrategy,
-        'FastAPI': FastAPIStrategy,
-        'Django-Rest': DjangoRestStrategy,
+        "Flask-Restx": FlaskRestxStrategy,
+        "FastAPI": FastAPIStrategy,
+        "Django-Rest": DjangoRestStrategy,
     }
 
-    def __init__(self, template_dir: Optional[Path] = None):
+    def __init__(self, template_dir: Path | None = None):
         """
         Initialize generator
 
@@ -93,43 +95,62 @@ class ProjectGenerator:
 
             return project_path
 
-        except Exception as e:
-            # Clean up on failure
+        except (OSError, PermissionError) as e:
+            # Clean up on file system failure
             if project_path.exists():
-                shutil.rmtree(project_path)
-            raise e
+                try:
+                    shutil.rmtree(project_path)
+                except (OSError, PermissionError):
+                    pass  # Best effort cleanup
+            raise FileSystemError(f"Failed to create project structure: {e}") from e
+        except (GenerationError, FileSystemError):
+            # Re-raise our custom exceptions
+            if project_path.exists():
+                try:
+                    shutil.rmtree(project_path)
+                except (OSError, PermissionError):
+                    pass  # Best effort cleanup
+            raise
+        except Exception as e:
+            # Clean up and wrap unexpected errors
+            if project_path.exists():
+                try:
+                    shutil.rmtree(project_path)
+                except (OSError, PermissionError):
+                    pass  # Best effort cleanup
+            raise GenerationError(f"Project generation failed: {e}") from e
 
     def _create_base_structure(self, project_path: Path, config: ProjectConfig):
         """Create basic directory structure"""
-        
+
         # Django tiene su propia estructura, skip base structure
-        if config.framework == 'Django-Rest':
+        if config.framework == "Django-Rest":
             # Solo crear tests/ si tiene testing
             if config.testing_suite:
-                tests_dir = project_path / 'tests'
+                tests_dir = project_path / "tests"
                 tests_dir.mkdir(exist_ok=True)
-                (tests_dir / '__init__.py').touch()
+                (tests_dir / "__init__.py").touch()
             return
-        
+
         # Para Flask y FastAPI, crear estructura src/
         dirs = [
-            'src',
-            'src/models',
-            'src/routes',
-            'src/services',
-            'src/config',
-            'src/utils',
+            "src",
+            "src/models",
+            "src/routes",
+            "src/services",
+            "src/config",
+            "src/utils",
         ]
 
         if config.testing_suite:
-            dirs.extend(['tests', 'tests/integration'])
+            dirs.extend(["tests", "tests/integration"])
 
         for dir_name in dirs:
             (project_path / dir_name).mkdir(parents=True, exist_ok=True)
 
             # Create __init__.py in Python packages
-            if dir_name.startswith('src/') or dir_name == 'tests':
-                (project_path / dir_name / '__init__.py').touch()
+            if dir_name.startswith("src/") or dir_name == "tests":
+                (project_path / dir_name / "__init__.py").touch()
 
     def _generate_common_files(self, project_path: Path, config: ProjectConfig):
         """Generate files common to all projects"""
@@ -137,60 +158,50 @@ class ProjectGenerator:
 
         # .gitignore
         self.renderer.render_to_file(
-            TemplateRegistry.COMMON_TEMPLATES['gitignore'],
-            project_path / '.gitignore',
-            context
+            TemplateRegistry.COMMON_TEMPLATES["gitignore"], project_path / ".gitignore", context
         )
 
         # .env.example
         self.renderer.render_to_file(
-            TemplateRegistry.COMMON_TEMPLATES['env_example'],
-            project_path / '.env.example',
-            context
+            TemplateRegistry.COMMON_TEMPLATES["env_example"], project_path / ".env.example", context
         )
 
         # README.md
         self.renderer.render_to_file(
-            TemplateRegistry.COMMON_TEMPLATES['readme'],
-            project_path / 'README.md',
-            context
+            TemplateRegistry.COMMON_TEMPLATES["readme"], project_path / "README.md", context
         )
 
         # LICENSE
         self.renderer.render_to_file(
-            TemplateRegistry.COMMON_TEMPLATES['license'],
-            project_path / 'LICENSE',
-            context
+            TemplateRegistry.COMMON_TEMPLATES["license"], project_path / "LICENSE", context
         )
 
         # security.py (if auth enabled)
         if config.auth_enabled:
             # Para Django-Rest, crear en la raíz del proyecto
-            if config.framework == 'Django-Rest':
-                security_path = project_path / 'security.py'
+            if config.framework == "Django-Rest":
+                security_path = project_path / "security.py"
             else:
                 # Para Flask y FastAPI, crear en src/
-                security_path = project_path / 'src' / 'security.py'
+                security_path = project_path / "src" / "security.py"
 
                 self.renderer.render_to_file(
-                TemplateRegistry.COMMON_TEMPLATES['security'],
-                security_path,
-                context
+                    TemplateRegistry.COMMON_TEMPLATES["security"], security_path, context
                 )
 
         # pyproject.toml (modern Python packaging)
         self.renderer.render_to_file(
-            TemplateRegistry.COMMON_TEMPLATES['pyproject_toml'],
-            project_path / 'pyproject.toml',
-            context
+            TemplateRegistry.COMMON_TEMPLATES["pyproject_toml"],
+            project_path / "pyproject.toml",
+            context,
         )
 
         # pytest.ini (common test configuration) - place at project root
         if config.testing_suite:
             self.renderer.render_to_file(
-                TemplateRegistry.COMMON_TEMPLATES['pytest_ini'],
-                project_path / 'pytest.ini',
-                context
+                TemplateRegistry.COMMON_TEMPLATES["pytest_ini"],
+                project_path / "pytest.ini",
+                context,
             )
 
     def _generate_dependencies(self, project_path: Path, config: ProjectConfig):
@@ -201,30 +212,27 @@ class ProjectGenerator:
         # requirements-dev.txt
         DependencyManager.write_requirements_dev_txt(project_path)
 
-
     def _generate_docker_files(self, project_path: Path, config: ProjectConfig):
         """Generate Docker configuration"""
         context = config.model_dump_safe()
 
         # Dockerfile
         self.renderer.render_to_file(
-            TemplateRegistry.COMMON_TEMPLATES['dockerfile'],
-            project_path / 'Dockerfile',
-            context
+            TemplateRegistry.COMMON_TEMPLATES["dockerfile"], project_path / "Dockerfile", context
         )
 
         # docker-compose.yml
         self.renderer.render_to_file(
-            TemplateRegistry.COMMON_TEMPLATES['docker_compose'],
-            project_path / 'docker-compose.yml',
-            context
+            TemplateRegistry.COMMON_TEMPLATES["docker_compose"],
+            project_path / "docker-compose.yml",
+            context,
         )
 
         # .dockerignore
         self.renderer.render_to_file(
-            TemplateRegistry.COMMON_TEMPLATES['dockerignore'],
-            project_path / '.dockerignore',
-            context
+            TemplateRegistry.COMMON_TEMPLATES["dockerignore"],
+            project_path / ".dockerignore",
+            context,
         )
 
     def validate_before_generate(self, config: ProjectConfig) -> tuple[bool, list[str]]:
@@ -238,9 +246,7 @@ class ProjectGenerator:
 
         # Check if templates exist
         templates_exist, missing = TemplateRegistry.validate_templates_exist(
-            self.renderer,
-            config.framework,
-            config.orm
+            self.renderer, config.framework, config.orm
         )
 
         if not templates_exist:
@@ -267,26 +273,23 @@ class ProjectGenerator:
         """
         deps_info = DependencyManager.get_dependency_info(config)
         templates = TemplateRegistry.get_templates_for_config(
-            config.framework,
-            config.orm,
-            config.auth_enabled,
-            config.testing_suite
+            config.framework, config.orm, config.auth_enabled, config.testing_suite
         )
 
         return {
-            'project_name': config.name,
-            'framework': config.framework,
-            'orm': config.orm,
-            'database': config.database,
-            'features': {
-                'authentication': config.auth_enabled,
-                'docker': config.docker_support,
-                'testing': config.testing_suite,
-                'git': config.git_init,
+            "project_name": config.name,
+            "framework": config.framework,
+            "orm": config.orm,
+            "database": config.database,
+            "features": {
+                "authentication": config.auth_enabled,
+                "docker": config.docker_support,
+                "testing": config.testing_suite,
+                "git": config.git_init,
             },
-            'dependencies': deps_info,
-            'templates_count': len(templates),
-            'output_path': str(config.get_output_path()),
+            "dependencies": deps_info,
+            "templates_count": len(templates),
+            "output_path": str(config.get_output_path()),
         }
 
 

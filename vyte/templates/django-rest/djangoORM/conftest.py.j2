@@ -145,7 +145,7 @@ def bearer_token(test_user, get_tokens_for_user):
 @pytest.fixture
 def db_with_data(db):
     """Database with test data loaded"""
-    try:        
+    try:
         # Create sample items
         Item.objects.create(
             name='Test Item 1',
@@ -157,7 +157,7 @@ def db_with_data(db):
         )
     except ImportError:
         pass  # Models not yet created
-    
+
     return db
 
 
@@ -194,12 +194,12 @@ def mock_now(monkeypatch):
     """Mock datetime.now() for time-dependent tests"""
     from datetime import datetime
     fake_now = datetime(2024, 1, 1, 12, 0, 0)
-    
+
     class MockDatetime:
         @classmethod
         def now(cls, tz=None):
             return fake_now
-    
+
     monkeypatch.setattr('django.utils.timezone.now', lambda: fake_now)
     return fake_now
 

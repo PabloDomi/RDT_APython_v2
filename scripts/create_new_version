@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Create a new version: update pyproject.toml, commit, tag and optionally push.
+# Create a new version: update __version__.py, commit, tag and optionally push.
 # Usage: ./create_new_version 2.0.4 [--no-push] [--sign]
 
 set -euo pipefail
@@ -9,10 +9,12 @@ usage() {
 Usage: $0 VERSION [--no-push] [--sign] [--dry-run]
 
 Example:
-  $0 2.0.4         # update pyproject.toml, commit, tag v2.0.4, push commit+tag
+  $0 2.0.4         # update __version__.py, commit, tag v2.0.4, push commit+tag
   $0 2.0.4 --no-push  # do everything except pushing to remote
   $0 2.0.4 --sign     # create a signed tag (gpg) if available
   $0 2.0.4 --dry-run  # print actions without executing
+
+Note: Version is now managed dynamically from vyte/__version__.py
 EOF
 }
 
@@ -30,8 +32,8 @@ DRY_RUN=0
 
 while [ "$#" -gt 0 ]; do
   case "$1" in
-    --no-push) NO_PUSH=1 ;; 
-    --sign) SIGN_TAG=1 ;; 
+    --no-push) NO_PUSH=1 ;;
+    --sign) SIGN_TAG=1 ;;
     --dry-run) DRY_RUN=1 ;;
     -h|--help) usage; exit 0 ;;
     *) echo "Unknown option: $1"; usage; exit 2 ;;
@@ -44,12 +46,17 @@ if ! echo "$VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+([.-].*)?$'; then
   exit 2
 fi
 
-PROJECT_FILE="../pyproject.toml"
+# Get the repository root directory
+REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+VERSION_FILE="$REPO_ROOT/vyte/__version__.py"
 
-if [ ! -f "$PROJECT_FILE" ]; then
-  echo "Error: $PROJECT_FILE not found in $(pwd)"
+if [ ! -f "$VERSION_FILE" ]; then
+  echo "Error: $VERSION_FILE not found"
   exit 2
 fi
+
+# Change to repository root for git operations
+cd "$REPO_ROOT"
 
 # Ensure git working tree is clean
 if [ -n "$(git status --porcelain 2>/dev/null)" ]; then
@@ -60,32 +67,72 @@ fi
 
 echo "Preparing to bump version to $VERSION"
 
-TMPFILE="${PROJECT_FILE}.tmp"
-BACKUP="${PROJECT_FILE}.bak"
+# Parse version into tuple format
+IFS='.' read -r -a VERSION_PARTS <<< "$VERSION"
+MAJOR="${VERSION_PARTS[0]}"
+MINOR="${VERSION_PARTS[1]}"
+PATCH="${VERSION_PARTS[2]:-0}"
 
-echo "Backing up $PROJECT_FILE -> $BACKUP"
-cp "$PROJECT_FILE" "$BACKUP"
+BACKUP="${VERSION_FILE}.bak"
 
-echo "Updating version in $PROJECT_FILE"
-# Replace the first occurrence of 'version = "..."' in the [project] table
-awk -v ver="$VERSION" '
-  BEGIN{inproj=0}
-  /^\[project\]/ { inproj=1; print; next }
-  /^\[.*\]/ && inproj==1 { inproj=0; print; next }
-  { if(inproj==1 && $0 ~ /^\s*version\s*=\s*"/){ print "version = \"" ver "\""; next } print }
-' "$PROJECT_FILE" > "$TMPFILE"
+echo "Backing up $VERSION_FILE -> $BACKUP"
+cp "$VERSION_FILE" "$BACKUP"
 
-mv "$TMPFILE" "$PROJECT_FILE"
+echo "Updating version in $VERSION_FILE"
 
-echo "New version written to $PROJECT_FILE"
+if [ "$DRY_RUN" -eq 1 ]; then
+  echo "[DRY RUN] Would update VERSION to ($MAJOR, $MINOR, $PATCH)"
+else
+  cat > "$VERSION_FILE" <<EOF
+# vyte/__version__.py
+"""Version information"""
+
+VERSION = ($MAJOR, $MINOR, $PATCH)
+__version__ = '.'.join(map(str, VERSION))
+EOF
+  echo "✓ Updated $VERSION_FILE to version $VERSION"
+fi
+
+# Update CHANGELOG.md with new version
+CHANGELOG="$REPO_ROOT/CHANGELOG.md"
+if [ -f "$CHANGELOG" ]; then
+  TODAY=$(date +%Y-%m-%d)
+  echo "Updating CHANGELOG.md"
+
+  if [ "$DRY_RUN" -eq 1 ]; then
+    echo "[DRY RUN] Would update CHANGELOG.md with version $VERSION"
+  else
+    # Insert new version section after the first ## heading
+    awk -v ver="$VERSION" -v date="$TODAY" '
+      !done && /^## \[/ {
+        print "## [" ver "] - " date
+        print ""
+        print "### Added"
+        print "- "
+        print ""
+        print "### Changed"
+        print "- "
+        print ""
+        print "### Fixed"
+        print "- "
+        print ""
+        done=1
+      }
+      { print }
+    ' "$CHANGELOG" > "${CHANGELOG}.tmp"
+    mv "${CHANGELOG}.tmp" "$CHANGELOG"
+    echo "✓ Updated CHANGELOG.md"
+  fi
+fi
 
 GIT_COMMIT_MSG="Bump version to $VERSION"
 
-echo "Staging $PROJECT_FILE"
+echo "Staging files"
 if [ "$DRY_RUN" -eq 1 ]; then
-  echo "DRY RUN: git add $PROJECT_FILE"
+  echo "DRY RUN: git add vyte/__version__.py CHANGELOG.md"
 else
-  git add "$PROJECT_FILE"
+  git add vyte/__version__.py
+  [ -f "$CHANGELOG" ] && git add CHANGELOG.md
 fi
 
 echo "Creating commit"

@@ -11,39 +11,39 @@ from django.core.validators import MinValueValidator
 {% if auth_enabled -%}
 class UserManager(BaseUserManager):
     """Custom user manager for email-based authentication"""
-    
+
     def create_user(self, email, password=None, **extra_fields):
         """Create and return a regular user"""
         if not email:
             raise ValueError('Users must have an email address')
-        
+
         email = self.normalize_email(email)
         extra_fields.setdefault('is_active', True)
         extra_fields.setdefault('is_staff', False)
         extra_fields.setdefault('is_superuser', False)
-        
+
         user = self.model(email=email, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
-    
+
     def create_superuser(self, email, password=None, **extra_fields):
         """Create and return a superuser"""
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('is_active', True)
-        
+
         if extra_fields.get('is_staff') is not True:
             raise ValueError('Superuser must have is_staff=True')
         if extra_fields.get('is_superuser') is not True:
             raise ValueError('Superuser must have is_superuser=True')
-        
+
         return self.create_user(email, password, **extra_fields)
 
 
 class User(AbstractBaseUser, PermissionsMixin):
     """Custom user model using email as username"""
-    
+
     email = models.EmailField(
         unique=True,
         db_index=True,
@@ -51,7 +51,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     )
     first_name = models.CharField(max_length=150, blank=True)
     last_name = models.CharField(max_length=150, blank=True)
-    
+
     # Status flags
     is_active = models.BooleanField(
         default=True,
@@ -61,18 +61,18 @@ class User(AbstractBaseUser, PermissionsMixin):
         default=False,
         help_text='Designates whether the user can log into admin site'
     )
-    
+
     # Timestamps
     date_joined = models.DateTimeField(default=timezone.now)
     last_login = models.DateTimeField(null=True, blank=True)
-    
+
     # Manager
     objects = UserManager()
-    
+
     # Authentication
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []  # Email is already required
-    
+
     class Meta:
         db_table = '{{ name | snake_case }}_users'
         verbose_name = 'User'
@@ -82,15 +82,15 @@ class User(AbstractBaseUser, PermissionsMixin):
             models.Index(fields=['email']),
             models.Index(fields=['-date_joined']),
         ]
-    
+
     def __str__(self):
         return self.email
-    
+
     def get_full_name(self):
         """Return the first_name plus the last_name, with a space in between"""
         full_name = f'{self.first_name} {self.last_name}'.strip()
         return full_name or self.email
-    
+
     def get_short_name(self):
         """Return the short name for the user"""
         return self.first_name or self.email.split('@')[0]
@@ -98,7 +98,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 {% else -%}
 class User(models.Model):
     """Basic user model without authentication"""
-    
+
     email = models.EmailField(
         unique=True,
         db_index=True,
@@ -106,11 +106,11 @@ class User(models.Model):
     )
     full_name = models.CharField(max_length=200, blank=True)
     is_active = models.BooleanField(default=True)
-    
+
     # Timestamps
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
     class Meta:
         db_table = '{{ name | snake_case }}_users'
         verbose_name = 'User'
@@ -120,10 +120,10 @@ class User(models.Model):
             models.Index(fields=['email']),
             models.Index(fields=['-created_at']),
         ]
-    
+
     def __str__(self):
         return self.email
-    
+
     def get_display_name(self):
         """Return full name or email"""
         return self.full_name or self.email
@@ -132,7 +132,7 @@ class User(models.Model):
 
 class Item(models.Model):
     """Item model for managing inventory/content"""
-    
+
     title = models.CharField(
         max_length=200,
         help_text='Item title'
@@ -141,7 +141,7 @@ class Item(models.Model):
         blank=True,
         help_text='Detailed description of the item'
     )
-    
+
     {% if auth_enabled -%}
     # Relationship
     owner = models.ForeignKey(
@@ -164,17 +164,17 @@ class Item(models.Model):
         help_text='Item price'
     )
     {% endif -%}
-    
+
     # Status
     is_active = models.BooleanField(
         default=True,
         help_text='Whether this item is active'
     )
-    
+
     # Timestamps
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
     class Meta:
         db_table = '{{ name }}_items'
         verbose_name = 'Item'
@@ -187,10 +187,10 @@ class Item(models.Model):
             models.Index(fields=['owner', '-created_at']),
             {% endif -%}
         ]
-    
+
     def __str__(self):
         return self.title
-    
+
     {% if not auth_enabled -%}
     @property
     def total_value(self):
@@ -202,10 +202,10 @@ class Item(models.Model):
 # Optional: Abstract base model for common fields
 class TimeStampedModel(models.Model):
     """Abstract base model with timestamp fields"""
-    
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
     class Meta:
         abstract = True
         ordering = ['-created_at']
@@ -213,8 +213,8 @@ class TimeStampedModel(models.Model):
 
 class ActiveModel(models.Model):
     """Abstract base model with active flag"""
-    
+
     is_active = models.BooleanField(default=True)
-    
+
     class Meta:
         abstract = True

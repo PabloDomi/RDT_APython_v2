@@ -17,22 +17,22 @@ def app():
     """Create application for testing"""
     app = create_app()
     app.config['TESTING'] = True
-    
+
     with app.app_context():
         # CRITICAL: Bind test database to models BEFORE creating tables
         test_db.bind([User, Item], bind_refs=False, bind_backrefs=False)
-        
+
         # Connect and create tables
         if test_db.is_closed():
             test_db.connect()
-        
+
         test_db.create_tables([User, Item], safe=True)
-        
+
         yield app
-        
+
         # Cleanup
         test_db.drop_tables([User, Item], safe=True)
-    
+
     # Close database connection
     if not test_db.is_closed():
         test_db.close()
@@ -48,12 +48,12 @@ def db(app):
         # Ensure connection is open
         if test_db.is_closed():
             test_db.connect()
-        
+
         # Start transaction
         test_db.begin()
-        
+
         yield test_db
-        
+
         # Rollback transaction (only if connection is still open)
         try:
             if not test_db.is_closed():
@@ -87,7 +87,7 @@ def auth_token(client, test_user):
         'username': 'testuser',
         'password': 'TestPassword123!'
     })
-    
+
     assert response.status_code == 200, f"Login failed: {response.json}"
     return response.json['access_token']
 

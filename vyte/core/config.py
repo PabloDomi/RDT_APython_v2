@@ -1,10 +1,11 @@
 """
 Configuration module with Pydantic validation
 """
-from typing import Literal
-from pathlib import Path
-from pydantic import BaseModel, Field, field_validator, ConfigDict
 
+from pathlib import Path
+from typing import Literal
+
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 # Type definitions for better type safety
 Framework = Literal["Flask-Restx", "FastAPI", "Django-Rest"]
@@ -27,42 +28,16 @@ class ProjectConfig(BaseModel):
         testing_suite: Include testing infrastructure
     """
 
-    name: str = Field(
-        ...,
-        min_length=1,
-        max_length=50,
-        description="Project name"
-    )
-    framework: Framework = Field(
-        ...,
-        description="Web framework"
-    )
-    orm: ORM = Field(
-        ...,
-        description="ORM/ODM to use"
-    )
-    database: Database = Field(
-        ...,
-        description="Database type"
-    )
-    auth_enabled: bool = Field(
-        default=True,
-        description="Include JWT authentication"
-    )
-    git_init: bool = Field(
-        default=True,
-        description="Initialize Git repository"
-    )
-    docker_support: bool = Field(
-        default=True,
-        description="Include Docker configuration"
-    )
-    testing_suite: bool = Field(
-        default=True,
-        description="Include testing infrastructure"
-    )
+    name: str = Field(..., min_length=1, max_length=50, description="Project name")
+    framework: Framework = Field(..., description="Web framework")
+    orm: ORM = Field(..., description="ORM/ODM to use")
+    database: Database = Field(..., description="Database type")
+    auth_enabled: bool = Field(default=True, description="Include JWT authentication")
+    git_init: bool = Field(default=True, description="Initialize Git repository")
+    docker_support: bool = Field(default=True, description="Include Docker configuration")
+    testing_suite: bool = Field(default=True, description="Include testing infrastructure")
 
-    @field_validator('name')
+    @field_validator("name")
     @classmethod
     def validate_name(cls, v: str) -> str:
         """Validate project name format"""
@@ -78,7 +53,7 @@ class ProjectConfig(BaseModel):
             raise ValueError(f"Directory '{v}' already exists")
 
         # Check valid characters
-        if not all(c.isalnum() or c in '-_' for c in v):
+        if not all(c.isalnum() or c in "-_" for c in v):
             raise ValueError(
                 "Project name can only contain letters, numbers, hyphens and underscores"
             )
@@ -89,28 +64,26 @@ class ProjectConfig(BaseModel):
 
         return v
 
-    @field_validator('orm')
+    @field_validator("orm")
     @classmethod
     def validate_orm(cls, v: ORM, info) -> ORM:
         """Validate ORM compatibility with framework"""
         if not info.data:
             return v
 
-        framework = info.data.get('framework')
+        framework = info.data.get("framework")
 
         # Compatibility rules
-        if framework == 'Flask-Restx' and v == 'TortoiseORM':
+        if framework == "Flask-Restx" and v == "TortoiseORM":
             raise ValueError(
                 "TortoiseORM is not compatible with Flask-Restx "
                 "(async/sync mismatch). Use SQLAlchemy or Peewee instead."
             )
 
-        if framework == 'Django-Rest' and v != 'DjangoORM':
-            raise ValueError(
-                "Django-Rest only works with DjangoORM"
-            )
+        if framework == "Django-Rest" and v != "DjangoORM":
+            raise ValueError("Django-Rest only works with DjangoORM")
 
-        if framework == 'FastAPI' and v == 'Peewee':
+        if framework == "FastAPI" and v == "Peewee":
             raise ValueError(
                 "Peewee is not recommended for FastAPI. "
                 "Use SQLAlchemy (async) or TortoiseORM instead."
@@ -144,12 +117,14 @@ class ProjectConfig(BaseModel):
         Useful for template rendering
         """
         data = self.model_dump()
-        data.update({
-            'python_version': self.get_python_version(),
-            'port': self.get_port(),
-            'is_async': self.is_async_framework(),
-            'requires_async_driver': self.requires_async_driver(),
-        })
+        data.update(
+            {
+                "python_version": self.get_python_version(),
+                "port": self.get_port(),
+                "is_async": self.is_async_framework(),
+                "requires_async_driver": self.requires_async_driver(),
+            }
+        )
         return data
 
     model_config = ConfigDict(
@@ -160,33 +135,33 @@ class ProjectConfig(BaseModel):
 
 # Compatibility matrix for reference and documentation
 COMPATIBILITY_MATRIX = {
-    'Flask-Restx': {
-        'compatible_orms': ['SQLAlchemy', 'Peewee'],
-        'incompatible_orms': ['TortoiseORM', 'DjangoORM'],
-        'reason': 'Flask is synchronous, TortoiseORM is async-only',
-        'databases': ['PostgreSQL', 'MySQL', 'SQLite'],
-        'async_support': False,
+    "Flask-Restx": {
+        "compatible_orms": ["SQLAlchemy", "Peewee"],
+        "incompatible_orms": ["TortoiseORM", "DjangoORM"],
+        "reason": "Flask is synchronous, TortoiseORM is async-only",
+        "databases": ["PostgreSQL", "MySQL", "SQLite"],
+        "async_support": False,
     },
-    'FastAPI': {
-        'compatible_orms': ['SQLAlchemy', 'TortoiseORM'],
-        'incompatible_orms': ['Peewee', 'DjangoORM'],
-        'reason': 'FastAPI is async, Peewee is sync-only',
-        'databases': ['PostgreSQL', 'MySQL', 'SQLite'],
-        'async_support': True,
+    "FastAPI": {
+        "compatible_orms": ["SQLAlchemy", "TortoiseORM"],
+        "incompatible_orms": ["Peewee", "DjangoORM"],
+        "reason": "FastAPI is async, Peewee is sync-only",
+        "databases": ["PostgreSQL", "MySQL", "SQLite"],
+        "async_support": True,
     },
-    'Django-Rest': {
-        'compatible_orms': ['DjangoORM'],
-        'incompatible_orms': ['SQLAlchemy', 'TortoiseORM', 'Peewee'],
-        'reason': 'Django-Rest uses Django ORM exclusively',
-        'databases': ['PostgreSQL', 'MySQL', 'SQLite'],
-        'async_support': False,
+    "Django-Rest": {
+        "compatible_orms": ["DjangoORM"],
+        "incompatible_orms": ["SQLAlchemy", "TortoiseORM", "Peewee"],
+        "reason": "Django-Rest uses Django ORM exclusively",
+        "databases": ["PostgreSQL", "MySQL", "SQLite"],
+        "async_support": False,
     },
 }
 
 
 def get_compatible_orms(framework: Framework) -> list[ORM]:
     """Get list of compatible ORMs for a framework"""
-    return COMPATIBILITY_MATRIX[framework]['compatible_orms']
+    return COMPATIBILITY_MATRIX[framework]["compatible_orms"]
 
 
 def get_framework_info(framework: Framework) -> dict:
@@ -203,22 +178,17 @@ def validate_combination(framework: Framework, orm: ORM) -> tuple[bool, str]:
     """
     info = COMPATIBILITY_MATRIX[framework]
 
-    if orm in info['compatible_orms']:
+    if orm in info["compatible_orms"]:
         return True, ""
 
-    if orm in info['incompatible_orms']:
-        return False, info['reason']
+    if orm in info["incompatible_orms"]:
+        return False, info["reason"]
 
     return False, f"{orm} is not supported with {framework}"
 
 
 # Quick validation function for CLI
-def quick_validate(
-    framework: str,
-    orm: str,
-    database: str,
-    name: str
-) -> tuple[bool, list[str]]:
+def quick_validate(framework: str, orm: str, database: str, name: str) -> tuple[bool, list[str]]:
     """
     Quick validation without creating ProjectConfig instance
     Returns: (is_valid, list_of_errors)

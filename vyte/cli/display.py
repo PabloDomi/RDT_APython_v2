@@ -4,12 +4,12 @@ Display utilities using Rich
 """
 import time
 from pathlib import Path
-from typing import List
+
 from rich.console import Console
-from rich.panel import Panel
-from rich.table import Table
-from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn
 from rich.markdown import Markdown
+from rich.panel import Panel
+from rich.progress import BarColumn, Progress, SpinnerColumn, TextColumn
+from rich.table import Table
 
 from ..core.config import ProjectConfig
 from ..core.generator import ProjectGenerator
@@ -30,20 +30,12 @@ def show_welcome():
     ╚═══════════════════════════════════════════╝
     """
 
-    console.print(Panel.fit(
-        banner,
-        border_style="cyan",
-        padding=(0, 2)
-    ))
+    console.print(Panel.fit(banner, border_style="cyan", padding=(0, 2)))
 
 
 def show_summary(config: ProjectConfig):
     """Show project configuration summary"""
-    table = Table(
-        title="📋 Project Configuration",
-        show_header=False,
-        border_style="cyan"
-    )
+    table = Table(title="📋 Project Configuration", show_header=False, border_style="cyan")
     table.add_column("Setting", style="cyan", width=20)
     table.add_column("Value", style="green")
 
@@ -62,10 +54,7 @@ def show_summary(config: ProjectConfig):
     console.print("\n")
 
 
-def show_generation_progress(
-    generator: ProjectGenerator,
-    config: ProjectConfig
-) -> Path:
+def show_generation_progress(generator: ProjectGenerator, config: ProjectConfig) -> Path:
     """
     Show generation progress with spinner
 
@@ -77,9 +66,8 @@ def show_generation_progress(
         TextColumn("[progress.description]{task.description}"),
         BarColumn(),
         TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
-        console=console
+        console=console,
     ) as progress:
-
         task = progress.add_task("🔨 Generating project...", total=100)
 
         # Start generation
@@ -146,20 +134,20 @@ cp .env.example .env
 """
 
     # Add database-specific commands
-    if config.orm == 'SQLAlchemy' and config.framework == 'Flask-Restx':
+    if config.orm == "SQLAlchemy" and config.framework == "Flask-Restx":
         steps += """```bash
 flask db init
 flask db migrate -m "Initial migration"
 flask db upgrade
 ```
 """
-    elif config.orm == 'SQLAlchemy' and config.framework == 'FastAPI':
+    elif config.orm == "SQLAlchemy" and config.framework == "FastAPI":
         steps += """```bash
 alembic revision --autogenerate -m "Initial migration"
 alembic upgrade head
 ```
 """
-    elif config.orm == 'TortoiseORM':
+    elif config.orm == "TortoiseORM":
         steps += """```bash
 aerich init -t src.config.config.TORTOISE_ORM
 aerich init-db
@@ -172,11 +160,11 @@ aerich init-db
 ```bash
 """
 
-    if config.framework == 'Flask-Restx':
+    if config.framework == "Flask-Restx":
         steps += "python app.py\n"
-    elif config.framework == 'FastAPI':
+    elif config.framework == "FastAPI":
         steps += "uvicorn src.main:app --reload\n"
-    elif config.framework == 'Django-Rest':
+    elif config.framework == "Django-Rest":
         steps += "python manage.py makemigrations\n"
         steps += "python manage.py migrate\n"
         steps += "python manage.py runserver\n"
@@ -184,10 +172,10 @@ aerich init-db
     steps += "```\n\n"
 
     # Add documentation URL
-    if config.framework == 'Flask-Restx':
+    if config.framework == "Flask-Restx":
         steps += "### 7. Visit API docs\n"
         steps += f"🌐 http://localhost:{config.get_port()}/\n\n"
-    elif config.framework == 'FastAPI':
+    elif config.framework == "FastAPI":
         steps += "### 7. Visit API docs\n"
         steps += f"🌐 http://localhost:{config.get_port()}/docs\n\n"
 
@@ -228,16 +216,14 @@ pytest --cov=src --cov-report=html
     console.print(Panel(md, border_style="green", padding=(1, 2)))
 
 
-def show_error(title: str, errors: List[str]):
+def show_error(title: str, errors: list[str]):
     """Show error messages"""
     error_text = "\n".join(f"• {error}" for error in errors)
 
     console.print("\n")
-    console.print(Panel(
-        f"[bold red]{title}[/bold red]\n\n{error_text}",
-        border_style="red",
-        padding=(1, 2)
-    ))
+    console.print(
+        Panel(f"[bold red]{title}[/bold red]\n\n{error_text}", border_style="red", padding=(1, 2))
+    )
     console.print("\n")
 
 

@@ -2,18 +2,19 @@
 """
 Pytest configuration and fixtures
 """
-import pytest
-from pathlib import Path
+import os
 import shutil
+import stat
 import tempfile
 import time
-import os
-import stat
+from pathlib import Path
+
+import pytest
+from click.testing import CliRunner
 
 from vyte.core.config import ProjectConfig
 from vyte.core.generator import ProjectGenerator
 from vyte.core.renderer import TemplateRenderer
-from click.testing import CliRunner
 
 
 @pytest.fixture

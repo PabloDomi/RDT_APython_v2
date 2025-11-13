@@ -15,7 +15,7 @@ class UserBase(BaseModel):
     """Base user schema"""
     username: str = Field(..., min_length=3, max_length=50, description="Username (3-50 characters)")
     email: EmailStr = Field(..., description="Valid email address")
-    
+
 {% if auth_enabled %}
     @field_validator('username')
     @classmethod
@@ -25,7 +25,7 @@ class UserBase(BaseModel):
             return InputSanitizer.sanitize_username(v)
         except ValueError as e:
             raise ValueError(str(e))
-    
+
     @field_validator('email')
     @classmethod
     def validate_email(cls, v: str) -> str:
@@ -41,7 +41,7 @@ class UserBase(BaseModel):
 class UserCreate(UserBase):
     """Schema for user registration"""
     password: str = Field(..., min_length=8, max_length=100, description="Password (min 8 characters)")
-    
+
     @field_validator('password')
     @classmethod
     def validate_password(cls, v: str) -> str:
@@ -91,7 +91,7 @@ class UserResponse(UserBase):
 {% if not auth_enabled %}
     full_name: Optional[str] = None
 {% endif %}
-    
+
     model_config = ConfigDict(from_attributes=True)
 
 

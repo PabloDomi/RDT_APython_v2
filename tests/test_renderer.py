@@ -37,19 +37,16 @@ def test_render_simple_template(renderer, temp_dir):
 
     # Render (would need actual template in templates/)
     # This is just to test the method exists
-    assert hasattr(renderer, 'render')
-    assert hasattr(renderer, 'render_to_file')
+    assert hasattr(renderer, "render")
+    assert hasattr(renderer, "render_to_file")
 
 
 def test_template_registry():
     """Test template registry"""
     templates = TemplateRegistry.get_templates_for_config(
-        framework="Flask-Restx",
-        orm="SQLAlchemy",
-        auth_enabled=True,
-        testing_suite=True
+        framework="Flask-Restx", orm="SQLAlchemy", auth_enabled=True, testing_suite=True
     )
 
     assert len(templates) > 0
-    assert 'init' in templates or 'init_auth' in templates
-    assert 'models' in templates
+    assert "init" in templates or "init_auth" in templates
+    assert "models" in templates

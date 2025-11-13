@@ -1,12 +1,16 @@
 import os
 import sys
 import tempfile
-import shutil
 from pathlib import Path
 
 import pytest
 
-from tests.integration._utils import insert_project_path, remove_project_path, import_with_retry, safe_rmtree
+from tests.integration._utils import (
+    import_with_retry,
+    insert_project_path,
+    remove_project_path,
+    safe_rmtree,
+)
 from vyte.core.config import ProjectConfig
 from vyte.core.generator import ProjectGenerator
 
@@ -132,44 +136,44 @@ user_ns.routes = [
         )
 
         # Clear caches and import
-        for modname in ['app', 'src', 'src.routes.routes_example']:
+        for modname in ["app", "src", "src.routes.routes_example"]:
             if modname in sys.modules:
                 del sys.modules[modname]
 
         insert_project_path(project_path)
         try:
-            mod = import_with_retry('app', project_path)
-            app = getattr(mod, 'app')
+            mod = import_with_retry("app", project_path)
+            app = mod.app
 
             # Use Flask test client
             client = app.test_client()
 
             # Root
-            r = client.get('/')
+            r = client.get("/")
             assert r.status_code == 200
             j = r.get_json()
-            assert j.get('status') in ('ok', 'healthy') or 'message' in j
+            assert j.get("status") in ("ok", "healthy") or "message" in j
 
             # Health
-            r2 = client.get('/health')
+            r2 = client.get("/health")
             assert r2.status_code == 200
-            assert r2.get_json().get('status') == 'healthy'
+            assert r2.get_json().get("status") == "healthy"
 
             # Users initially empty
-            r3 = client.get('/users')
+            r3 = client.get("/users")
             assert r3.status_code == 200
 
             # Create user
-            payload = {'username': 'test', 'email': 't@example.com'}
-            r4 = client.post('/users', json=payload)
+            payload = {"username": "test", "email": "t@example.com"}
+            r4 = client.post("/users", json=payload)
             assert r4.status_code == 201
             created = r4.get_json()
-            assert created['id'] == 1
-            assert created['username'] == payload['username']
+            assert created["id"] == 1
+            assert created["username"] == payload["username"]
 
         finally:
             remove_project_path(project_path)
-            for modname in ['app', 'src', 'src.routes.routes_example']:
+            for modname in ["app", "src", "src.routes.routes_example"]:
                 if modname in sys.modules:
                     del sys.modules[modname]
 

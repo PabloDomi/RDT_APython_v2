@@ -9,11 +9,11 @@ from src.config.config import settings, get_tortoise_config
 async def init_db():
     """
     Initialize database connection
-    
+
     Call this during application startup
     """
     await Tortoise.init(config=get_tortoise_config())
-    
+
     # Only generate schemas in development (Aerich handles migrations in production)
     if settings.is_development:
         await Tortoise.generate_schemas()
@@ -22,7 +22,7 @@ async def init_db():
 async def close_db():
     """
     Close database connections
-    
+
     Call this during application shutdown
     """
     await Tortoise.close_connections()
@@ -32,7 +32,7 @@ async def close_db():
 async def get_db_connection():
     """
     Get database connection
-    
+
     Usage:
         conn = await get_db_connection()
         await conn.execute_query("SELECT * FROM users")

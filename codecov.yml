@@ -1,0 +1,44 @@
+# Codecov configuration for Vyte
+
+coverage:
+  precision: 2
+  round: down
+  range: "70...100"
+
+  status:
+    project:
+      default:
+        target: 73%
+        threshold: 1%
+        if_ci_failed: error
+
+    patch:
+      default:
+        target: 70%
+        threshold: 5%
+
+comment:
+  layout: "reach,diff,flags,tree,footer"
+  behavior: default
+  require_changes: false
+  require_base: no
+  require_head: yes
+
+ignore:
+  - "tests/**/*"
+  - "scripts/**/*"
+  - "docs/**/*"
+  - "**/__pycache__/**/*"
+  - "vyte/templates/**/*"
+  - "setup.py"
+
+flags:
+  unit:
+    paths:
+      - vyte/
+    carryforward: true
+
+  integration:
+    paths:
+      - tests/integration/
+    carryforward: true

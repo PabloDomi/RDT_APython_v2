@@ -5,8 +5,8 @@ Test strategy pattern implementations
 
 from vyte.core.config import ProjectConfig
 from vyte.core.renderer import TemplateRenderer
-from vyte.strategies.flask_restx import FlaskRestxStrategy
 from vyte.strategies.fastapi import FastAPIStrategy
+from vyte.strategies.flask_restx import FlaskRestxStrategy
 
 
 def test_flask_strategy():

@@ -2,8 +2,8 @@
 """
 Test dependency management
 """
-from vyte.core.dependencies import DependencyManager
 from vyte.core.config import ProjectConfig
+from vyte.core.dependencies import DependencyManager
 
 
 def test_get_all_dependencies():
@@ -19,10 +19,10 @@ def test_get_all_dependencies():
     deps = DependencyManager.get_all_dependencies(config)
 
     assert len(deps) > 0
-    assert any('flask' in d.lower() for d in deps)
-    assert any('sqlalchemy' in d.lower() for d in deps)
-    assert any('psycopg2' in d.lower() for d in deps)
-    assert any('jwt' in d.lower() for d in deps)
+    assert any("flask" in d.lower() for d in deps)
+    assert any("sqlalchemy" in d.lower() for d in deps)
+    assert any("psycopg2" in d.lower() for d in deps)
+    assert any("jwt" in d.lower() for d in deps)
 
 
 def test_dependency_info():
@@ -38,12 +38,12 @@ def test_dependency_info():
 
     info = DependencyManager.get_dependency_info(config)
 
-    assert info['total'] > 0
-    assert info['base'] > 0
-    assert info['framework'] > 0
-    assert info['orm'] > 0
-    assert info['testing'] > 0
-    assert info['auth'] > 0
+    assert info["total"] > 0
+    assert info["base"] > 0
+    assert info["framework"] > 0
+    assert info["orm"] > 0
+    assert info["testing"] > 0
+    assert info["auth"] > 0
 
 
 def test_async_driver_selection():
@@ -58,8 +58,8 @@ def test_async_driver_selection():
     deps = DependencyManager.get_all_dependencies(config)
 
     # Should include async driver
-    assert any('asyncpg' in d.lower() for d in deps)
-    assert not any('psycopg2' in d.lower() for d in deps)
+    assert any("asyncpg" in d.lower() for d in deps)
+    assert not any("psycopg2" in d.lower() for d in deps)
 
 
 def test_sync_driver_selection():
@@ -74,5 +74,5 @@ def test_sync_driver_selection():
     deps = DependencyManager.get_all_dependencies(config)
 
     # Should include sync driver
-    assert any('psycopg2' in d.lower() for d in deps)
-    assert not any('asyncpg' in d.lower() for d in deps)
+    assert any("psycopg2" in d.lower() for d in deps)
+    assert not any("asyncpg" in d.lower() for d in deps)

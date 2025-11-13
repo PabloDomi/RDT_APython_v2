@@ -52,15 +52,15 @@ class Register(Resource):
     def post(self):
         """Register new user"""
         data = request.json
-        
+
         if User.query.filter_by(username=data['username']).first():
             user_ns.abort(400, 'Username exists')
-        
+
         user = User(username=data['username'], email=data['email'])
         user.set_password(data['password'])
         db.session.add(user)
         db.session.commit()
-        
+
         return user, 201
 
 
@@ -71,10 +71,10 @@ class Login(Resource):
         """Login"""
         data = request.json
         user = User.query.filter_by(username=data['username']).first()
-        
+
         if not user or not user.check_password(data['password']):
             user_ns.abort(401, 'Invalid credentials')
-        
+
         access_token = create_access_token(identity=user)
         return {'access_token': access_token, 'user': user.to_dict()}, 200
 
@@ -105,7 +105,7 @@ class UserList(Resource):
     def get(self):
         """Get all users"""
         return User.query.all()
-    
+
     @user_ns.expect(user_input)
     @user_ns.marshal_with(user_model, code=201)
     def post(self):

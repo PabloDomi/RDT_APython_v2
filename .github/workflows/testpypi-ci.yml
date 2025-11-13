@@ -87,21 +87,21 @@ jobs:
         run: |
           source venv_test/bin/activate
           set -e
-          
+
           echo "🧪 Running smoke tests..."
           vyte --version
           vyte --help
-          
+
           # Create a temporary directory and generate a project non-interactively
           TMPDIR=$(mktemp -d)
           cd "$TMPDIR"
           vyte create --no-interactive --name ci_test --framework FastAPI --orm SQLAlchemy --database SQLite
-          
+
           if [ ! -d ci_test ]; then
             echo "❌ Generated project folder not found"
             exit 2
           fi
-          
+
           echo "✅ Project generated successfully"
           echo "📁 Files in generated project:"
           ls -la ci_test | head -n 50

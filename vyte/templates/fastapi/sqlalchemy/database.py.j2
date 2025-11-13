@@ -49,7 +49,7 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
     """
     Dependency for getting database session.
     Automatically handles session lifecycle.
-    
+
     Usage in endpoints:
         @app.get("/items")
         async def read_items(db: AsyncSession = Depends(get_db)):

@@ -48,14 +48,14 @@ def create_app():
                 port=db_config.get('port')
             )
         db.initialize(database)
-    
+
     # Initialize Flask-Restx
     api.init_app(app)
-    
+
     {% if auth_enabled -%}
     # Initialize JWT
     jwt.init_app(app)
-    
+
     # JWT Configuration
     @jwt.user_identity_loader
     def user_identity_lookup(user):
@@ -74,13 +74,13 @@ def create_app():
 
     # Register namespaces
     api.add_namespace(user_ns)
-    
+
     # Health check endpoint
     @app.route('/health')
     def health_check():
         """Health check endpoint for Docker"""
         return {'status': 'healthy', 'message': 'Application is running'}, 200
-    
+
     # Create tables
     with app.app_context():
         db.obj.create_tables([User, Item], safe=True)

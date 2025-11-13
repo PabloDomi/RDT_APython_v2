@@ -8,34 +8,34 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     """Application settings with validation"""
-    
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
         case_sensitive=False,
     )
-    
+
     # Application
     app_name: str = Field(default="{{ name }}")
     environment: str = Field(default="development")
     debug: bool = Field(default=True)
-    
+
     # Server
     host: str = Field(default="0.0.0.0")
     port: int = Field(default={{ port }})
-    
+
     # API Configuration
     api_prefix: str = Field(default="/api")
     docs_url: str = Field(default="/docs")
     redoc_url: str = Field(default="/redoc")
     openapi_url: str = Field(default="/openapi.json")
-    
+
     # CORS
     cors_origins: str = Field(default='["http://localhost:3000", "http://localhost:8000"]')
-    
+
     # Logging
     log_level: str = Field(default="INFO")
-    
+
     # Database - Peewee uses different format
 {% if database == 'PostgreSQL' %}
     database_name: str = Field(default="{{ name }}_db")
@@ -55,7 +55,7 @@ class Settings(BaseSettings):
     database_name: str = Field(default="{{ name }}.db")
     database_url: str = Field(default="sqlite:///./{{ name }}.db")
 {% endif %}
-    
+
 {% if auth_enabled %}
     # JWT
     jwt_secret_key: str = Field(
@@ -82,7 +82,7 @@ class Config:
     JWT_SECRET_KEY = settings.jwt_secret_key
     JWT_ALGORITHM = settings.jwt_algorithm
 {% endif %}
-    
+
     # Peewee database config
     DATABASE = {
 {% if database == 'PostgreSQL' %}

@@ -1,9 +1,10 @@
 """
 Alembic setup and configuration automation
 """
+
 # Use explicit encoding string when writing files. Do not import codec module here.
-import subprocess
 import os
+import subprocess
 from pathlib import Path
 
 
@@ -13,11 +14,7 @@ class AlembicConfigurator:
     """
 
     @staticmethod
-    def setup_alembic(
-        project_path: Path,
-        project_name: str,
-        module_name: str = "src"
-    ) -> bool:
+    def setup_alembic(project_path: Path, project_name: str, module_name: str = "src") -> bool:
         """
         Initialize and configure Alembic for FastAPI + SQLAlchemy projects
 
@@ -37,10 +34,7 @@ class AlembicConfigurator:
             # 1. Run alembic init
             print("  🔧 Initializing Alembic...")
             result = subprocess.run(
-                ["alembic", "init", "alembic"],
-                capture_output=True,
-                text=True,
-                check=False
+                ["alembic", "init", "alembic"], capture_output=True, text=True, check=False
             )
 
             if result.returncode != 0:
@@ -54,11 +48,7 @@ class AlembicConfigurator:
 
             # 3. Configure env.py
             print("  📝 Configuring alembic/env.py...")
-            AlembicConfigurator._configure_env_py(
-                project_path,
-                project_name,
-                module_name
-            )
+            AlembicConfigurator._configure_env_py(project_path, project_name, module_name)
 
             print("  ✅ Alembic configured successfully")
             return True
@@ -80,24 +70,19 @@ class AlembicConfigurator:
         if not alembic_ini.exists():
             return
 
-        with open(alembic_ini, 'r', encoding='utf-8') as f:
+        with open(alembic_ini, encoding="utf-8") as f:
             content = f.read()
 
         # Replace the sqlalchemy.url line
         content = content.replace(
-            "sqlalchemy.url = driver://user:pass@localhost/dbname",
-            "sqlalchemy.url = "
+            "sqlalchemy.url = driver://user:pass@localhost/dbname", "sqlalchemy.url = "
         )
 
-        with open(alembic_ini, 'w', encoding='utf-8') as f:
+        with open(alembic_ini, "w", encoding="utf-8") as f:
             f.write(content)
 
     @staticmethod
-    def _configure_env_py(
-        project_path: Path,
-        project_name: str,
-        module_name: str
-    ):
+    def _configure_env_py(project_path: Path, project_name: str, module_name: str):
         """Replace env.py with configured version"""
         env_py = project_path / "alembic" / "env.py"
 
@@ -184,14 +169,12 @@ else:
     run_migrations_online()
 '''
 
-        with open(env_py, 'w', encoding='utf-8') as f:
+        with open(env_py, "w", encoding="utf-8") as f:
             f.write(env_content)
 
     @staticmethod
     def create_alembic_structure_manually(
-        project_path: Path,
-        project_name: str,
-        module_name: str = "src"
+        project_path: Path, project_name: str, module_name: str = "src"
     ):
         """
         Create Alembic structure manually without running alembic init
@@ -215,7 +198,7 @@ script_location = alembic
 prepend_sys_path = .
 path_separator = os
 
-sqlalchemy.url = 
+sqlalchemy.url =
 
 [loggers]
 keys = root,sqlalchemy,alembic
@@ -252,15 +235,11 @@ format = %(levelname)-5.5s [%(name)s] %(message)s
 datefmt = %H:%M:%S
 """
 
-        with open(project_path / "alembic.ini", 'w', encoding='utf-8') as f:
+        with open(project_path / "alembic.ini", "w", encoding="utf-8") as f:
             f.write(alembic_ini_content)
 
         # Create env.py
-        AlembicConfigurator._configure_env_py(
-            project_path,
-            project_name,
-            module_name
-        )
+        AlembicConfigurator._configure_env_py(project_path, project_name, module_name)
 
         # Create script.py.mako
         script_mako_content = '''"""${message}
@@ -291,7 +270,7 @@ def downgrade() -> None:
     ${downgrades if downgrades else "pass"}
 '''
 
-        with open(alembic_dir / "script.py.mako", 'w', encoding='utf-8') as f:
+        with open(alembic_dir / "script.py.mako", "w", encoding="utf-8") as f:
             f.write(script_mako_content)
 
         print("  ✅ Alembic structure created manually")

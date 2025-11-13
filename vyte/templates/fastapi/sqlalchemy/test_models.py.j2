@@ -11,7 +11,7 @@ from src.models.models import User, Item
 
 class TestUserModel:
     """Test User model"""
-    
+
     @pytest.mark.asyncio
     async def test_create_user(self, db):
         """Test creating a user"""
@@ -21,13 +21,13 @@ class TestUserModel:
             password='TestPassword123!',
             db=db
         )
-        
+
         assert user.id is not None
         assert user.username == 'testuser'
         assert user.email == 'test@example.com'
         assert user.hashed_password is not None
         assert user.hashed_password != 'TestPassword123!'
-    
+
     @pytest.mark.asyncio
     async def test_password_hashing(self, db):
         """Test password is hashed correctly"""
@@ -37,13 +37,13 @@ class TestUserModel:
             password='MyPassword123!',
             db=db
         )
-        
+
         assert user.hashed_password != 'MyPassword123!'
         assert len(user.hashed_password) > 20
         assert user.verify_password('MyPassword123!')
         assert not user.verify_password('WrongPassword')
         assert not user.verify_password('')
-    
+
     @pytest.mark.asyncio
     async def test_unique_username(self, db, test_user):
         """Test username uniqueness constraint"""
@@ -54,7 +54,7 @@ class TestUserModel:
                 password='Password123!',
                 db=db
             )
-    
+
     @pytest.mark.asyncio
     async def test_unique_email(self, db, test_user):
         """Test email uniqueness constraint"""
@@ -65,23 +65,23 @@ class TestUserModel:
                 password='Password123!',
                 db=db
             )
-    
+
     def test_user_to_dict(self, test_user):
         """Test user serialization"""
         user_dict = test_user.to_dict()
-        
+
         assert 'id' in user_dict
         assert user_dict['username'] == 'testuser'
         assert user_dict['email'] == 'test@example.com'
         assert 'hashed_password' not in user_dict
         assert 'password' not in user_dict
-    
+
     def test_user_repr(self, test_user):
         """Test user string representation"""
         repr_str = repr(test_user)
         assert 'User' in repr_str
         assert 'testuser' in repr_str
-    
+
     @pytest.mark.asyncio
     async def test_user_is_active_default(self, db):
         """Test user is active by default"""
@@ -96,7 +96,7 @@ class TestUserModel:
 
 class TestItemModel:
     """Test Item model"""
-    
+
     @pytest.mark.asyncio
     async def test_create_item(self, db, test_user):
         """Test creating an item"""
@@ -108,12 +108,12 @@ class TestItemModel:
         db.add(item)
         await db.commit()
         await db.refresh(item)
-        
+
         assert item.id is not None
         assert item.title == 'Test Item'
         assert item.description == 'Test description'
         assert item.owner_id == test_user.id
-    
+
     @pytest.mark.asyncio
     async def test_item_owner_relationship(self, db, test_user):
         """Test item-owner relationship"""
@@ -125,18 +125,18 @@ class TestItemModel:
         db.add(item)
         await db.commit()
         await db.refresh(item)
-        
+
         # Test forward relationship
         assert item.owner is not None
         assert item.owner.id == test_user.id
         assert item.owner.username == 'testuser'
-        
+
         # Test reverse relationship
         result = await db.execute(select(Item).filter(Item.owner_id == test_user.id))
         items = result.scalars().all()
         assert len(items) > 0
         assert item in items
-    
+
     @pytest.mark.asyncio
     async def test_item_to_dict(self, db, test_user):
         """Test item serialization"""
@@ -148,14 +148,14 @@ class TestItemModel:
         db.add(item)
         await db.commit()
         await db.refresh(item)
-        
+
         item_dict = item.to_dict()
-        
+
         assert 'id' in item_dict
         assert item_dict['title'] == 'Serialization Test'
         assert item_dict['description'] == 'Testing to_dict'
         assert item_dict['owner_id'] == test_user.id
-    
+
     @pytest.mark.asyncio
     async def test_item_cascade_delete(self, db, test_user):
         """Test that items are deleted when user is deleted"""
@@ -167,16 +167,16 @@ class TestItemModel:
         db.add(item)
         await db.commit()
         item_id = item.id
-        
+
         # Delete user
         await db.delete(test_user)
         await db.commit()
-        
+
         # Verify items are cascade deleted
         result = await db.execute(select(Item).filter(Item.id == item_id))
         remaining_item = result.scalar_one_or_none()
         assert remaining_item is None
-    
+
     @pytest.mark.asyncio
     async def test_item_repr(self, db, test_user):
         """Test item string representation"""
@@ -187,21 +187,21 @@ class TestItemModel:
         )
         db.add(item)
         await db.commit()
-        
+
         repr_str = repr(item)
         assert 'Item' in repr_str
         assert 'Repr Test' in repr_str
-    
+
     @pytest.mark.asyncio
     async def test_multiple_items_per_user(self, db, test_user):
         """Test user can have multiple items"""
         item1 = Item(title='Item 1', owner_id=test_user.id)
         item2 = Item(title='Item 2', owner_id=test_user.id)
         item3 = Item(title='Item 3', owner_id=test_user.id)
-        
+
         db.add_all([item1, item2, item3])
         await db.commit()
-        
+
         result = await db.execute(select(Item).filter(Item.owner_id == test_user.id))
         items = result.scalars().all()
         assert len(items) == 3
@@ -213,7 +213,7 @@ class TestItemModel:
 
 class TestUserModel:
     """Test User model"""
-    
+
     @pytest.mark.asyncio
     async def test_create_user(self, db):
         """Test creating a user"""
@@ -225,12 +225,12 @@ class TestUserModel:
         db.add(user)
         await db.commit()
         await db.refresh(user)
-        
+
         assert user.id is not None
         assert user.username == 'testuser'
         assert user.email == 'test@example.com'
         assert user.full_name == 'Test User'
-    
+
     @pytest.mark.asyncio
     async def test_user_to_dict(self, db):
         """Test user serialization"""
@@ -238,44 +238,44 @@ class TestUserModel:
         db.add(user)
         await db.commit()
         await db.refresh(user)
-        
+
         user_dict = user.to_dict()
-        
+
         assert 'id' in user_dict
         assert user_dict['username'] == 'dictuser'
         assert user_dict['email'] == 'dict@example.com'
-    
+
     @pytest.mark.asyncio
     async def test_unique_username(self, db):
         """Test username uniqueness constraint"""
         user1 = User(username='uniquetest', email='unique1@example.com')
         db.add(user1)
         await db.commit()
-        
+
         with pytest.raises(IntegrityError):
             user2 = User(username='uniquetest', email='unique2@example.com')
             db.add(user2)
             await db.commit()
-    
+
     @pytest.mark.asyncio
     async def test_unique_email(self, db):
         """Test email uniqueness constraint"""
         user1 = User(username='unique1', email='uniquetest@example.com')
         db.add(user1)
         await db.commit()
-        
+
         with pytest.raises(IntegrityError):
             user2 = User(username='unique2', email='uniquetest@example.com')
             db.add(user2)
             await db.commit()
-    
+
     @pytest.mark.asyncio
     async def test_user_repr(self, db):
         """Test user string representation"""
         user = User(username='repruser', email='repr@example.com')
         db.add(user)
         await db.commit()
-        
+
         repr_str = repr(user)
         assert 'User' in repr_str
         assert 'repruser' in repr_str
@@ -283,7 +283,7 @@ class TestUserModel:
 
 class TestItemModel:
     """Test Item model"""
-    
+
     @pytest.mark.asyncio
     async def test_create_item(self, db):
         """Test creating an item"""
@@ -291,7 +291,7 @@ class TestItemModel:
         db.add(user)
         await db.commit()
         await db.refresh(user)
-        
+
         item = Item(
             title='Test Item',
             description='Test description',
@@ -300,12 +300,12 @@ class TestItemModel:
         db.add(item)
         await db.commit()
         await db.refresh(item)
-        
+
         assert item.id is not None
         assert item.title == 'Test Item'
         assert item.description == 'Test description'
         assert item.owner_id == user.id
-    
+
     @pytest.mark.asyncio
     async def test_item_owner_relationship(self, db):
         """Test item-owner relationship"""
@@ -313,7 +313,7 @@ class TestItemModel:
         db.add(user)
         await db.commit()
         await db.refresh(user)
-        
+
         item = Item(
             title='Relationship Test',
             description='Testing relationships',
@@ -322,18 +322,18 @@ class TestItemModel:
         db.add(item)
         await db.commit()
         await db.refresh(item)
-        
+
         # Test forward relationship
         assert item.owner is not None
         assert item.owner.id == user.id
         assert item.owner.username == 'relowner'
-        
+
         # Test reverse relationship
         result = await db.execute(select(Item).filter(Item.owner_id == user.id))
         items = result.scalars().all()
         assert len(items) > 0
         assert item in items
-    
+
     @pytest.mark.asyncio
     async def test_item_to_dict(self, db):
         """Test item serialization"""
@@ -341,7 +341,7 @@ class TestItemModel:
         db.add(user)
         await db.commit()
         await db.refresh(user)
-        
+
         item = Item(
             title='Serialization Test',
             description='Testing to_dict',
@@ -350,14 +350,14 @@ class TestItemModel:
         db.add(item)
         await db.commit()
         await db.refresh(item)
-        
+
         item_dict = item.to_dict()
-        
+
         assert 'id' in item_dict
         assert item_dict['title'] == 'Serialization Test'
         assert item_dict['description'] == 'Testing to_dict'
         assert item_dict['owner_id'] == user.id
-    
+
     @pytest.mark.asyncio
     async def test_item_repr(self, db):
         """Test item string representation"""
@@ -365,7 +365,7 @@ class TestItemModel:
         db.add(user)
         await db.commit()
         await db.refresh(user)
-        
+
         item = Item(
             title='Repr Test',
             description='Test',
@@ -373,11 +373,11 @@ class TestItemModel:
         )
         db.add(item)
         await db.commit()
-        
+
         repr_str = repr(item)
         assert 'Item' in repr_str
         assert 'Repr Test' in repr_str
-    
+
     @pytest.mark.asyncio
     async def test_multiple_items_per_user(self, db):
         """Test user can have multiple items"""
@@ -385,14 +385,14 @@ class TestItemModel:
         db.add(user)
         await db.commit()
         await db.refresh(user)
-        
+
         item1 = Item(title='Item 1', owner_id=user.id)
         item2 = Item(title='Item 2', owner_id=user.id)
         item3 = Item(title='Item 3', owner_id=user.id)
-        
+
         db.add_all([item1, item2, item3])
         await db.commit()
-        
+
         result = await db.execute(select(Item).filter(Item.owner_id == user.id))
         items = result.scalars().all()
         assert len(items) == 3

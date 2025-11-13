@@ -1,21 +1,18 @@
-import sys
 import os
+import sys
 import tempfile
-import shutil
 from pathlib import Path
-import importlib
 
 import pytest
 from fastapi.testclient import TestClient
 
 from tests.integration._utils import (
-    insert_project_path,
-    remove_project_path,
     import_with_retry,
+    insert_project_path,
+    manual_load_module_from_path,
+    remove_project_path,
     safe_rmtree,
 )
-from tests.integration._utils import manual_load_module_from_path
-
 from vyte.core.config import ProjectConfig
 from vyte.core.generator import ProjectGenerator
 
@@ -120,15 +117,17 @@ async def create_item(item: dict):
                 routes_mod = import_with_retry("src.api.routes", project_path)
             except Exception:
                 try:
-                    api_file = project_path / 'src' / 'api' / 'routes.py'
+                    api_file = project_path / "src" / "api" / "routes.py"
                     if api_file.exists():
-                        routes_mod = manual_load_module_from_path('src.api.routes', api_file, project_src=project_path / 'src')
+                        routes_mod = manual_load_module_from_path(
+                            "src.api.routes", api_file, project_src=project_path / "src"
+                        )
                 except Exception:
                     routes_mod = None
 
             # Import main app
             mod = import_with_retry("src.main", project_path)
-            app = getattr(mod, "app")
+            app = mod.app
 
             # Ensure router is available under /api (some generated mains may not wire stubs predictably)
             if routes_mod is None:
@@ -312,28 +311,41 @@ if router is not None:
             # multiple temporary generated projects are used in the same pytest
             # session.
             import uuid
+
             from fastapi import FastAPI
 
             app = FastAPI()
 
             # Load DB and models, create tables if possible
             try:
-                db_file = project_path / 'src' / 'database.py'
+                db_file = project_path / "src" / "database.py"
                 db_mod = None
                 if db_file.exists():
-                    db_mod = manual_load_module_from_path(f"testproj_{uuid.uuid4().hex[:8]}.database", db_file, project_src=project_path / 'src')
+                    db_mod = manual_load_module_from_path(
+                        f"testproj_{uuid.uuid4().hex[:8]}.database",
+                        db_file,
+                        project_src=project_path / "src",
+                    )
 
-                models_file = project_path / 'src' / 'models' / 'models.py'
+                models_file = project_path / "src" / "models" / "models.py"
                 if models_file.exists():
-                    _ = manual_load_module_from_path(f"testproj_{uuid.uuid4().hex[:8]}.models", models_file, project_src=project_path / 'src')
+                    _ = manual_load_module_from_path(
+                        f"testproj_{uuid.uuid4().hex[:8]}.models",
+                        models_file,
+                        project_src=project_path / "src",
+                    )
                 else:
-                    models_file2 = project_path / 'src' / 'models.py'
+                    models_file2 = project_path / "src" / "models.py"
                     if models_file2.exists():
-                        _ = manual_load_module_from_path(f"testproj_{uuid.uuid4().hex[:8]}.models", models_file2, project_src=project_path / 'src')
+                        _ = manual_load_module_from_path(
+                            f"testproj_{uuid.uuid4().hex[:8]}.models",
+                            models_file2,
+                            project_src=project_path / "src",
+                        )
 
                 if db_mod is not None:
-                    Base = getattr(db_mod, 'Base', None)
-                    engine = getattr(db_mod, 'engine', None)
+                    Base = getattr(db_mod, "Base", None)
+                    engine = getattr(db_mod, "engine", None)
                     if Base is not None and engine is not None:
                         Base.metadata.create_all(bind=engine)
             except Exception:
@@ -341,17 +353,21 @@ if router is not None:
 
             # Load routes and include router (do not print during normal test runs)
             try:
-                api_file = project_path / 'src' / 'api' / 'routes.py'
+                api_file = project_path / "src" / "api" / "routes.py"
                 routes_mod = None
                 if api_file.exists():
                     try:
-                        routes_mod = manual_load_module_from_path(f"testproj_{uuid.uuid4().hex[:8]}.api.routes", api_file, project_src=project_path / 'src')
+                        routes_mod = manual_load_module_from_path(
+                            f"testproj_{uuid.uuid4().hex[:8]}.api.routes",
+                            api_file,
+                            project_src=project_path / "src",
+                        )
                     except Exception:
                         routes_mod = None
 
-                if routes_mod is not None and hasattr(routes_mod, 'router'):
+                if routes_mod is not None and hasattr(routes_mod, "router"):
                     try:
-                        app.include_router(routes_mod.router, prefix='/api')
+                        app.include_router(routes_mod.router, prefix="/api")
                     except Exception:
                         pass
             except Exception:

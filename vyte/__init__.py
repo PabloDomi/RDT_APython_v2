@@ -1,23 +1,24 @@
 # vyte/__init__.py
 """
-vyte - Rapid Development Tool
+Vyte - Rapid Development Tool
 
 Professional API project generator for Python
 """
 
-__version__ = "2.0.0"
-__author__ = "Your Name"
+from .__version__ import __version__
+
+__author__ = "Pablo Domínguez"
 __license__ = "MIT"
 
 from .core.config import ProjectConfig
-from .core.generator import ProjectGenerator, quick_generate
 from .core.dependencies import DependencyManager
+from .core.generator import ProjectGenerator, quick_generate
 from .core.renderer import TemplateRenderer
 
 __all__ = [
-    'ProjectConfig',
-    'ProjectGenerator',
-    'quick_generate',
-    'DependencyManager',
-    'TemplateRenderer',
+    "ProjectConfig",
+    "ProjectGenerator",
+    "quick_generate",
+    "DependencyManager",
+    "TemplateRenderer",
 ]

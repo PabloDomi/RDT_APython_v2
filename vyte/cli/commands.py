@@ -1,66 +1,82 @@
 """
 CLI commands for vyte
 """
+
 import sys
 from pathlib import Path
+
 import click
 from rich.console import Console
 from rich.table import Table
-from ..core.config import get_framework_info
 
-
-from ..core.config import ProjectConfig, COMPATIBILITY_MATRIX, get_compatible_orms
-from ..core.generator import ProjectGenerator
-from ..core.dependencies import DependencyManager
-from .interactive import interactive_setup
-from .display import (
-    show_welcome,
-    show_summary,
-    show_next_steps,
-    show_generation_progress,
-    show_error,
-    show_success,
-    show_warning,
+from ..__version__ import __version__
+from ..core.config import (
+    COMPATIBILITY_MATRIX,
+    ProjectConfig,
+    get_compatible_orms,
+    get_framework_info,
 )
+from ..core.dependencies import DependencyManager
+from ..core.generator import ProjectGenerator
+from ..exceptions import (
+    ConfigurationError,
+    FileSystemError,
+    GenerationError,
+    GitError,
+    ValidationError,
+    VyteError,
+)
+from .display import (
+    show_error,
+    show_generation_progress,
+    show_next_steps,
+    show_success,
+    show_summary,
+    show_warning,
+    show_welcome,
+)
+from .interactive import interactive_setup
 
 console = Console()
 
 
-@click.group()
-@click.version_option(version="2.0.0", prog_name="vyte")
+@click.group(name="vyte")
+@click.version_option(version=__version__, prog_name="Vyte")
 def cli():
     """
-    🚀 vyte - Rapid Development Tool
+    🚀 Vyte - Rapid Development Tool
 
     Professional API project generator for Python.
     Supports Flask-Restx, FastAPI, and Django-Rest with multiple ORMs.
     """
 
+
 @cli.command()
-@click.option('--name', '-n', help='Project name')
+@click.option("--name", "-n", help="Project name")
 @click.option(
-    '--framework', '-f',
-    type=click.Choice(['Flask-Restx', 'FastAPI', 'Django-Rest'], case_sensitive=False),
-    help='Web framework'
+    "--framework",
+    "-f",
+    type=click.Choice(["Flask-Restx", "FastAPI", "Django-Rest"], case_sensitive=False),
+    help="Web framework",
 )
 @click.option(
-    '--orm', '-o',
-    type=click.Choice(['SQLAlchemy', 'TortoiseORM', 'Peewee', 'DjangoORM'], case_sensitive=False),
-    help='ORM/ODM'
+    "--orm",
+    "-o",
+    type=click.Choice(["SQLAlchemy", "TortoiseORM", "Peewee", "DjangoORM"], case_sensitive=False),
+    help="ORM/ODM",
 )
 @click.option(
-    '--database', '-d',
-    type=click.Choice(['PostgreSQL', 'MySQL', 'SQLite'], case_sensitive=False),
-    help='Database type'
+    "--database",
+    "-d",
+    type=click.Choice(["PostgreSQL", "MySQL", "SQLite"], case_sensitive=False),
+    help="Database type",
 )
-@click.option('--auth/--no-auth', default=True, help='Include JWT authentication')
-@click.option('--docker/--no-docker', default=True, help='Include Docker support')
-@click.option('--tests/--no-tests', default=True, help='Include testing suite')
-@click.option('--git/--no-git', default=True, help='Initialize Git repository')
+@click.option("--auth/--no-auth", default=True, help="Include JWT authentication")
+@click.option("--docker/--no-docker", default=True, help="Include Docker support")
+@click.option("--tests/--no-tests", default=True, help="Include testing suite")
+@click.option("--git/--no-git", default=True, help="Initialize Git repository")
 @click.option(
-    '--interactive/--no-interactive', '-i',
-    default=True,
-    help='Interactive mode (recommended)'
+    "--interactive/--no-interactive", "-i", default=True, help="Interactive mode (recommended)"
 )
 def create(name, framework, orm, database, auth, docker, tests, git, interactive):
     """
@@ -101,7 +117,7 @@ def create(name, framework, orm, database, auth, docker, tests, git, interactive
 
         # Confirm in interactive mode
         if interactive:
-            if not click.confirm('\n✨ Ready to generate project?', default=True):
+            if not click.confirm("\n✨ Ready to generate project?", default=True):
                 show_warning("Operation cancelled")
                 return
 
@@ -125,28 +141,42 @@ def create(name, framework, orm, database, auth, docker, tests, git, interactive
         show_success(f"Project created successfully at: {project_path}")
         show_next_steps(project_path, config)
 
-    except ValueError as e:
+    except (ConfigurationError, ValidationError) as e:
         show_error("Configuration Error", [str(e)])
         sys.exit(1)
     except FileExistsError as e:
-        show_error("Directory Exists", [str(e)])
+        show_error(
+            "Directory Exists",
+            [str(e), "Please choose a different project name or remove the existing directory."],
+        )
         sys.exit(1)
-    except (OSError, IOError) as e:
-        show_error("File System Error", [str(e)])
+    except (FileSystemError, OSError) as e:
+        show_error("File System Error", [str(e), "Check permissions and disk space."])
         sys.exit(1)
+    except GenerationError as e:
+        show_error("Generation Failed", [str(e)])
+        sys.exit(1)
+    except GitError as e:
+        show_warning(f"Git initialization failed: {e}")
+        console.print("[yellow]Project created but git repository was not initialized[/yellow]")
     except KeyboardInterrupt:
         show_warning("Operation cancelled by user")
+        sys.exit(130)  # Standard exit code for SIGINT
+    except VyteError as e:
+        show_error("Vyte Error", [str(e)])
         sys.exit(1)
-    except Exception as e:
-        show_error("Unexpected Error", [str(e)])
+    except Exception as e:  # noqa: BLE001 - Catch-all for unexpected errors with proper reporting
+        show_error(
+            "Unexpected Error",
+            [str(e), "This is a bug. Please report it at https://github.com/PabloDomi/Vyte/issues"],
+        )
         console.print_exception()
         sys.exit(1)
 
 
 @cli.command()
 @click.argument(
-    'framework',
-    type=click.Choice(['Flask-Restx', 'FastAPI', 'Django-Rest'], case_sensitive=False)
+    "framework", type=click.Choice(["Flask-Restx", "FastAPI", "Django-Rest"], case_sensitive=False)
 )
 def info(framework):
     """
@@ -164,17 +194,15 @@ def info(framework):
     table.add_column("Property", style="cyan", width=20)
     table.add_column("Value", style="green")
 
-    table.add_row("Compatible ORMs", ", ".join(framework_info['compatible_orms']))
-    table.add_row("Databases", ", ".join(framework_info['databases']))
-    table.add_row("Async Support", "✅ Yes" if framework_info['async_support'] else "❌ No")
+    table.add_row("Compatible ORMs", ", ".join(framework_info["compatible_orms"]))
+    table.add_row("Databases", ", ".join(framework_info["databases"]))
+    table.add_row("Async Support", "✅ Yes" if framework_info["async_support"] else "❌ No")
 
-    if framework_info['incompatible_orms']:
+    if framework_info["incompatible_orms"]:
         table.add_row(
-            "Incompatible ORMs",
-            ", ".join(framework_info['incompatible_orms']),
-            style="red"
+            "Incompatible ORMs", ", ".join(framework_info["incompatible_orms"]), style="red"
         )
-        table.add_row("Reason", framework_info['reason'], style="yellow")
+        table.add_row("Reason", framework_info["reason"], style="yellow")
 
     console.print("\n")
     console.print(table)
@@ -183,12 +211,11 @@ def info(framework):
 
 @cli.command()
 @click.argument(
-    'framework',
-    type=click.Choice(['Flask-Restx', 'FastAPI', 'Django-Rest'], case_sensitive=False)
+    "framework", type=click.Choice(["Flask-Restx", "FastAPI", "Django-Rest"], case_sensitive=False)
 )
-@click.option('--orm', help='Specific ORM to show dependencies for')
-@click.option('--database', '-d', help='Specific database')
-@click.option('--auth/--no-auth', default=True, help='Include auth dependencies')
+@click.option("--orm", help="Specific ORM to show dependencies for")
+@click.option("--database", "-d", help="Specific database")
+@click.option("--auth/--no-auth", default=True, help="Include auth dependencies")
 def deps(framework, orm, database, auth):
     """
     Show dependencies for a configuration
@@ -201,7 +228,7 @@ def deps(framework, orm, database, auth):
     if not orm:
         orm = get_compatible_orms(framework)[0]
     if not database:
-        database = 'PostgreSQL'
+        database = "PostgreSQL"
 
     # Create config
     config = ProjectConfig(
@@ -227,13 +254,13 @@ def deps(framework, orm, database, auth):
     stats_table.add_column("Category", style="cyan")
     stats_table.add_column("Count", style="green", justify="right")
 
-    stats_table.add_row("Total Dependencies", str(deps_info['total']))
-    stats_table.add_row("Base", str(deps_info['base']))
-    stats_table.add_row("Framework", str(deps_info['framework']))
-    stats_table.add_row("ORM", str(deps_info['orm']))
-    stats_table.add_row("Testing", str(deps_info['testing']))
+    stats_table.add_row("Total Dependencies", str(deps_info["total"]))
+    stats_table.add_row("Base", str(deps_info["base"]))
+    stats_table.add_row("Framework", str(deps_info["framework"]))
+    stats_table.add_row("ORM", str(deps_info["orm"]))
+    stats_table.add_row("Testing", str(deps_info["testing"]))
     if auth:
-        stats_table.add_row("Authentication", str(deps_info['auth']))
+        stats_table.add_row("Authentication", str(deps_info["auth"]))
 
     console.print(stats_table)
     console.print("\n[bold]Package List:[/bold]\n")
@@ -244,7 +271,7 @@ def deps(framework, orm, database, auth):
     console.print("\n")
 
 
-@cli.command('list')
+@cli.command("list")
 def list_frameworks():
     """
     List all available frameworks and ORMs
@@ -257,8 +284,8 @@ def list_frameworks():
     table.add_column("Async", justify="center", width=8)
 
     for framework, framework_info in COMPATIBILITY_MATRIX.items():
-        async_mark = "✅" if framework_info['async_support'] else "❌"
-        orms = ", ".join(framework_info['compatible_orms'])
+        async_mark = "✅" if framework_info["async_support"] else "❌"
+        orms = ", ".join(framework_info["compatible_orms"])
         table.add_row(framework, orms, async_mark)
 
     console.print(table)
@@ -266,7 +293,7 @@ def list_frameworks():
 
 
 @cli.command()
-@click.argument('project_path', type=click.Path(exists=True))
+@click.argument("project_path", type=click.Path(exists=True))
 def validate(project_path):
     """
     Validate an existing project structure
@@ -282,10 +309,10 @@ def validate(project_path):
 
     # Check for required files
     required_files = [
-        'requirements.txt',
-        'README.md',
-        '.gitignore',
-        '.env.example',
+        "requirements.txt",
+        "README.md",
+        ".gitignore",
+        ".env.example",
     ]
 
     for file in required_files:
@@ -294,8 +321,8 @@ def validate(project_path):
         checks.append((file, exists, status))
 
     # Check for src directory
-    src_exists = (project_path / 'src').exists()
-    checks.append(('src/', src_exists, "✅" if src_exists else "❌"))
+    src_exists = (project_path / "src").exists()
+    checks.append(("src/", src_exists, "✅" if src_exists else "❌"))
 
     # Display results
     table = Table(show_header=True)
@@ -319,7 +346,8 @@ def validate(project_path):
 def docs():
     """Open documentation in browser"""
     import webbrowser
-    url = "https://github.com/yourusername/Vyte"
+
+    url = "https://github.com/PabloDomi/Vyte"
     console.print(f"\n[cyan]Opening documentation: {url}[/cyan]\n")
     webbrowser.open(url)
 
@@ -330,26 +358,16 @@ def _init_git(project_path: Path):
 
     try:
         # Initialize git
-        subprocess.run(
-            ['git', 'init'],
-            cwd=project_path,
-            check=True,
-            capture_output=True
-        )
+        subprocess.run(["git", "init"], cwd=project_path, check=True, capture_output=True)
 
         # Initial commit
-        subprocess.run(
-            ['git', 'add', '.'],
-            cwd=project_path,
-            check=True,
-            capture_output=True
-        )
+        subprocess.run(["git", "add", "."], cwd=project_path, check=True, capture_output=True)
 
         subprocess.run(
-            ['git', 'commit', '-m', 'Initial commit from vyte'],
+            ["git", "commit", "-m", "Initial commit from vyte"],
             cwd=project_path,
             check=True,
-            capture_output=True
+            capture_output=True,
         )
 
         console.print("[green]✅ Git repository initialized[/green]")
@@ -360,5 +378,5 @@ def _init_git(project_path: Path):
         console.print("[yellow]⚠️  Git not found. Please install git to use this feature[/yellow]")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     cli()

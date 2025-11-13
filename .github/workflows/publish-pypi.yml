@@ -78,7 +78,7 @@ jobs:
           python -m venv venv_test_publish
           source venv_test_publish/bin/activate
           python -m pip install --upgrade pip
-          
+
           # Retry logic for PyPI propagation
           for i in {1..5}; do
             echo "📥 Attempt $i: Installing vyte==$VERSION from PyPI"
@@ -94,21 +94,21 @@ jobs:
               sleep 30
             fi
           done
-          
+
           echo "🧪 Running smoke tests..."
           vyte --version
           vyte --help
-          
+
           # Try a non-interactive project creation
           TMPDIR=$(mktemp -d)
           cd "$TMPDIR"
           vyte create --no-interactive --name ci_publish_test --framework FastAPI --orm SQLAlchemy --database SQLite
-          
+
           if [ ! -d ci_publish_test ]; then
             echo "❌ Generated project folder not found"
             exit 2
           fi
-          
+
           echo "✅ Smoke tests passed!"
           echo "📁 Generated files:"
           ls -la ci_publish_test | head -n 20

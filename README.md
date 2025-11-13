@@ -4,6 +4,10 @@
 [![Python Version](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Tests](https://github.com/PabloDomi/Vyte/actions/workflows/lint-test.yml/badge.svg)](https://github.com/PabloDomi/Vyte/actions)
+[![codecov](https://codecov.io/gh/PabloDomi/Vyte/branch/main/graph/badge.svg)](https://codecov.io/gh/PabloDomi/Vyte)
+[![Pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 
 > Professional API project generator for Python. Create production-ready REST APIs in seconds.
 
@@ -31,7 +35,7 @@ pip install vyte
 pipx install vyte
 
 # From source
-git clone https://github.com/yourusername/Vyte.git
+git clone https://github.com/PabloDomi/Vyte.git
 cd vyte
 pip install -e .
 ```
@@ -132,11 +136,11 @@ vyte --version
 
 ## 🎯 Supported Combinations
 
-| Framework    | Compatible ORMs                    | Async Support |
-|-------------|-----------------------------------|---------------|
-| Flask-Restx | SQLAlchemy, Peewee                 | ❌ Sync       |
-| FastAPI     | SQLAlchemy (async), TortoiseORM   | ✅ Async      |
-| Django-Rest | Django ORM                        | ❌ Sync       |
+| Framework   | Compatible ORMs                 | Async Support |
+| ----------- | ------------------------------- | ------------- |
+| Flask-Restx | SQLAlchemy, Peewee              | ❌ Sync       |
+| FastAPI     | SQLAlchemy (async), TortoiseORM | ✅ Async      |
+| Django-Rest | Django ORM                      | ❌ Sync       |
 
 ## 🔧 Configuration
 
@@ -185,7 +189,6 @@ docker-compose down
 - [Full Documentation](https://vyte.readthedocs.io)
 - [API Reference](https://vyte.readthedocs.io/api)
 - [Examples](./examples)
-- [Contributing Guide](./CONTRIBUTING.md)
 
 ## 🤝 Contributing
 
@@ -193,19 +196,39 @@ Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md)
 
 ```bash
 # Clone repo
-git clone https://github.com/yourusername/Vyte.git
+git clone https://github.com/PabloDomi/Vyte.git
 cd vyte
 
-# Install with dev dependencies
-poetry install
+# Setup development environment
+pip install -e ".[dev]"
+pip install pre-commit black ruff isort
+
+# Install pre-commit hooks
+pre-commit install
 
 # Run tests
 pytest
 
 # Format code
-black .
-ruff check .
+make format
+
+# Run linters
+make lint
+
+# Run full CI suite
+make ci
 ```
+
+## 🗺️ Roadmap
+
+Check out our [Roadmap](ROADMAP.md) to see what's planned for future releases!
+
+**Coming in v2.1.0:**
+
+- `vyte upgrade` - Upgrade existing projects
+- `vyte add-model` - Add models to projects
+- Customizable templates
+- MongoDB support
 
 ## 📝 License
 
@@ -218,12 +241,20 @@ MIT License - see [LICENSE](LICENSE) file for details.
 - Templates with [Jinja2](https://jinja.palletsprojects.com/)
 - Validation with [Pydantic](https://docs.pydantic.dev/)
 
+## 📊 Project Stats
+
+- **Test Coverage**: 73%
+- **Code Quality**: A+ (Ruff, Black)
+- **Security**: Scanned with Bandit
+- **Python Versions**: 3.11, 3.12, 3.13
+- **Platforms**: Linux, macOS, Windows
+
 ## 📧 Contact
 
-- **Issues**: [GitHub Issues](https://github.com/yourusername/Vyte/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/yourusername/Vyte/discussions)
-- **Email**: your.email@example.com
+- **Issues**: [GitHub Issues](https://github.com/PabloDomi/Vyte/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/PabloDomi/Vyte/discussions)
+- **Email**: Domi@usal.es
 
----
+______________________________________________________________________
 
-Made with ❤️ by the Vyte team
+Made with ❤️ by Pablo Domínguez Blanco

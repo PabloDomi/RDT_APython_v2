@@ -1,16 +1,15 @@
-import sys
-import os
-import tempfile
-import shutil
-from pathlib import Path
 import importlib
+import os
+import sys
+import tempfile
+from pathlib import Path
 
-from fastapi.testclient import TestClient
 import pytest
+from fastapi.testclient import TestClient
 
+from tests.integration._utils import safe_rmtree
 from vyte.core.config import ProjectConfig
 from vyte.core.generator import ProjectGenerator
-from tests.integration._utils import safe_rmtree
 
 
 @pytest.mark.integration
@@ -101,7 +100,7 @@ async def stub_health():
                     pkg.__path__ = [str(project_path / "src" / "api")]
                     sys.modules["src.api"] = pkg
 
-                with open(routes_path, "r", encoding="utf-8") as f:
+                with open(routes_path, encoding="utf-8") as f:
                     code = f.read()
                 module = types.ModuleType(module_name)
                 module.__file__ = str(routes_path)
@@ -110,7 +109,7 @@ async def stub_health():
 
             # Import the generated FastAPI app
             mod = importlib.import_module("src.main")
-            app = getattr(mod, "app")
+            app = mod.app
 
             client = TestClient(app)
 
