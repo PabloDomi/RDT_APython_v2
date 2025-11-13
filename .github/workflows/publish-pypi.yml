@@ -9,7 +9,7 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write  # Necesario para crear GitHub Releases
       packages: write
       id-token: write  # Needed for trusted publishing (opcional pero recomendado)
     outputs:
