@@ -12,7 +12,7 @@ By participating in this project, you agree to maintain a respectful and inclusi
 
 - Python 3.11 or higher
 - Git
-- Poetry (recommended) or pip
+- pip
 
 ### Setting Up Development Environment
 
@@ -33,11 +33,8 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 3. **Install Dependencies**
 
 ```bash
-# Using pip
+# Install in editable mode with dev dependencies
 pip install -e ".[dev]"
-
-# Using poetry (recommended)
-poetry install
 ```
 
 4. **Verify Installation**

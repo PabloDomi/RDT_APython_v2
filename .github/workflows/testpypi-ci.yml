@@ -30,16 +30,16 @@ jobs:
       - name: Read project version
         id: read_version
         run: |
-          # Extract version from pyproject.toml using tomllib
+          # Extract version from vyte/__version__.py (dynamic version)
           python - <<'PY' > /tmp/pyproject_version.txt
-          import tomllib
-          with open('pyproject.toml', 'rb') as f:
-              data = tomllib.load(f)
-              print(data['project']['version'])
+          import sys
+          sys.path.insert(0, 'vyte')
+          from __version__ import __version__
+          print(__version__)
           PY
           VERSION=$(cat /tmp/pyproject_version.txt)
           echo "VERSION=$VERSION" >> $GITHUB_ENV
-          echo "version=$VERSION" >> $GITHUB_OUTPUT  # ← Mejor práctica
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "📦 Package version: $VERSION"
 
       - name: Build distributions

@@ -6,7 +6,7 @@ This guide helps you set up your development environment for contributing to Vyt
 
 - Python 3.11 or higher
 - Git
-- pip or Poetry
+- pip
 
 ## Initial Setup
 

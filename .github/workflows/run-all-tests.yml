@@ -34,54 +34,22 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: 'pip'
 
-      - name: Cache Poetry dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/pypoetry
-            .venv
-          key: ${{ runner.os }}-poetry-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-poetry-${{ matrix.python-version }}-
-
       - name: Show Python and pip versions
         run: |
           python --version
           pip --version
 
-      - name: Install Poetry
+      - name: Install dependencies
         shell: bash
         run: |
           python -m pip install --upgrade pip
-          pip install poetry
-
-      - name: Configure Poetry
-        shell: bash
-        run: |
-          poetry config virtualenvs.create true
-          poetry config virtualenvs.in-project true
-
-      - name: Generate lock file if missing
-        shell: bash
-        run: |
-          if [ ! -f poetry.lock ]; then
-            echo "⚠️ poetry.lock not found, generating..."
-            poetry lock --no-update
-          else
-            echo "✅ poetry.lock found"
-          fi
-
-      - name: Install dependencies (default + dev)
-        shell: bash
-        run: |
-          poetry install --with dev --no-interaction
+          pip install -e .[dev]
 
       - name: Run full test suite
         shell: bash
         run: |
           echo "🧪 Running full test suite (pytest -q) on ${{ matrix.os }} with Python ${{ matrix.python-version }}"
-          # Run every test present (unit, integration, slow) — equivalent to `pytest -q` locally
-          poetry run pytest -q
+          pytest -q
 
       - name: Upload test artifacts on failure
         if: failure()

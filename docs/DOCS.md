@@ -893,7 +893,7 @@ my-api/
 ├── Dockerfile               # Imagen Docker
 ├── docker-compose.yml       # Orquestación
 ├── pytest.ini               # Config pytest
-├── pyproject.toml           # Config Poetry
+├── pyproject.toml           # Configuración del proyecto
 ├── README.md                # Documentación
 └── LICENSE                  # Licencia MIT
 ```
