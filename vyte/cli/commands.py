@@ -247,7 +247,9 @@ def deps(framework, orm, database, auth):
     deps_info = DependencyManager.get_dependency_info(config)
 
     # Display
-    console.print(f"\n[bold cyan]📦 Dependencies for {framework} + {orm} + {database}[/bold cyan]\n")
+    console.print(
+        f"\n[bold cyan]📦 Dependencies for {framework} + {orm} + {database}[/bold cyan]\n"
+    )
 
     # Stats table
     stats_table = Table(show_header=False)

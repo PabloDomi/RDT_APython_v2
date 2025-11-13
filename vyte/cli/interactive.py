@@ -83,7 +83,9 @@ def interactive_setup() -> ProjectConfig:
     ).execute()
 
     # Authentication
-    auth_enabled = inquirer.confirm(message="🔐 Include JWT authentication?", default=True).execute()
+    auth_enabled = inquirer.confirm(
+        message="🔐 Include JWT authentication?", default=True
+    ).execute()
 
     # Docker support
     docker_support = inquirer.confirm(
