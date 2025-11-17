@@ -1,7 +1,7 @@
 # Welcome to Vyte
 
 <p align="center">
-  <img src="../images/Logo_V_Transparente.png" alt="Vyte Logo" width="400"/>
+  <img src="images/Logo_V_Transparente.png" alt="Vyte Logo" width="400"/>
 </p>
 
 <p align="center">

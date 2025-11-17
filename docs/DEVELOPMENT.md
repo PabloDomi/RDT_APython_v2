@@ -290,8 +290,8 @@ Create `.vscode/settings.json`:
 ## Next Steps
 
 - Read [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines
-- Check [README.md](README.md) for project documentation
-- Browse [docs/](docs/) for detailed documentation
+- Check the [Home Page](index.md) for project documentation
+- Browse the documentation for detailed guides
 
 ## Getting Help
 
