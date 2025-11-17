@@ -1,0 +1,131 @@
+site_name: Vyte Documentation
+site_description: Professional API project generator for Python
+site_author: PabloDomi
+site_url: https://pablodomi.github.io/Vyte/
+
+repo_name: PabloDomi/Vyte
+repo_url: https://github.com/PabloDomi/Vyte
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  logo: images/Logo_V_isotopo.png
+  favicon: images/Logo_V_Favicon.png
+  palette:
+    # Light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: cyan
+      accent: deep purple
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: cyan
+      accent: deep purple
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+    - toc.follow
+
+  icon:
+    repo: fontawesome/brands/github
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/PabloDomi/Vyte
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/vyte/
+
+  version:
+    provider: mike
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.emoji
+  - admonition
+  - pymdownx.details
+  - attr_list
+  - md_in_html
+  - def_list
+  - tables
+  - footnotes
+  - toc:
+      permalink: true
+      toc_depth: 3
+
+plugins:
+  - search:
+      lang: en
+  - git-revision-date-localized:
+      enable_creation_date: true
+      enable_git_follow: false
+      type: timeago
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [vyte]
+          options:
+            docstring_style: google
+            show_source: true
+            show_root_heading: true
+            show_root_full_path: false
+            show_category_heading: true
+            members_order: source
+            group_by_category: true
+            show_signature_annotations: true
+
+nav:
+  - Home: index.md
+  - Getting Started:
+    - Installation: quickstart.md
+    - Quick Start: quickstart.md
+    - Configuration: configuration.md
+  - User Guide:
+    - CLI Commands: cli.md
+    - Frameworks: frameworks.md
+    - ORMs & Databases: databases.md
+    - Integration: integration.md
+  - Development:
+    - Contributing: CONTRIBUTING.md
+    - Development Setup: DEVELOPMENT.md
+    - Roadmap: ROADMAP.md
+  - Reference:
+    - API Reference: api-reference.md
+    - Changelog: CHANGELOG.md
+  - About:
+    - Branding: BRANDING.md
+    - Security: SECURITY.md
+    - Contributors: CONTRIBUTORS.md
+
+copyright: Copyright &copy; 2025 PabloDomi

@@ -17,6 +17,8 @@
   <a href="https://codecov.io/gh/PabloDomi/Vyte"><img src="https://codecov.io/gh/PabloDomi/Vyte/branch/main/graph/badge.svg" alt="codecov"></a>
   <a href="https://github.com/pre-commit/pre-commit"><img src="https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit" alt="Pre-commit"></a>
   <a href="https://github.com/astral-sh/ruff"><img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json" alt="Ruff"></a>
+  <br>
+  <a href="https://pablodomi.github.io/Vyte/"><img src="https://img.shields.io/badge/docs-mkdocs-blue.svg" alt="Documentation"></a>
 </p>
 
 ______________________________________________________________________
