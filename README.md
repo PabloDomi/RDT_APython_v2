@@ -1,15 +1,25 @@
 # 🚀 vyte - Rapid Development Tool
 
-[![PyPI version](https://badge.fury.io/py/vyte.svg)](https://badge.fury.io/py/vyte)
-[![Python Version](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![Tests](https://github.com/PabloDomi/Vyte/actions/workflows/lint-test.yml/badge.svg)](https://github.com/PabloDomi/Vyte/actions)
-[![codecov](https://codecov.io/gh/PabloDomi/Vyte/branch/main/graph/badge.svg)](https://codecov.io/gh/PabloDomi/Vyte)
-[![Pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
-[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+<p align="center">
+  <img src="images/Logo_V_Transparente.png" alt="Vyte Logo" width="400"/>
+</p>
 
-> Professional API project generator for Python. Create production-ready REST APIs in seconds.
+<p align="center">
+  <strong>Professional API project generator for Python. Create production-ready REST APIs in seconds.</strong>
+</p>
+
+<p align="center">
+  <a href="https://badge.fury.io/py/vyte"><img src="https://badge.fury.io/py/vyte.svg" alt="PyPI version"></a>
+  <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/python-3.11+-blue.svg" alt="Python Version"></a>
+  <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
+  <a href="https://github.com/psf/black"><img src="https://img.shields.io/badge/code%20style-black-000000.svg" alt="Code style: black"></a>
+  <a href="https://github.com/PabloDomi/Vyte/actions"><img src="https://github.com/PabloDomi/Vyte/actions/workflows/lint-test.yml/badge.svg" alt="Tests"></a>
+  <a href="https://codecov.io/gh/PabloDomi/Vyte"><img src="https://codecov.io/gh/PabloDomi/Vyte/branch/main/graph/badge.svg" alt="codecov"></a>
+  <a href="https://github.com/pre-commit/pre-commit"><img src="https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit" alt="Pre-commit"></a>
+  <a href="https://github.com/astral-sh/ruff"><img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json" alt="Ruff"></a>
+</p>
+
+______________________________________________________________________
 
 ## ✨ Features
 

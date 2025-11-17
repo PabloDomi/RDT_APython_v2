@@ -58,6 +58,10 @@ vyte = "vyte.cli.commands:cli"
 [project.urls]
 "Homepage" = "https://github.com/PabloDomi/Vyte"
 "Bug Tracker" = "https://github.com/PabloDomi/Vyte/issues"
+"Documentation" = "https://github.com/PabloDomi/Vyte/blob/main/docs/"
+"Changelog" = "https://github.com/PabloDomi/Vyte/blob/main/docs/CHANGELOG.md"
+"Source Code" = "https://github.com/PabloDomi/Vyte"
+"Logo" = "https://raw.githubusercontent.com/PabloDomi/Vyte/main/images/Logo_V_Transparente.png"
 
 [build-system]
 requires = ["setuptools>=61.0", "wheel"]
