@@ -351,7 +351,7 @@ tests/
 5. alembic upgrade head
 6. uvicorn src.main:app --reload
 
-🌐 API docs: http://localhost:8000/docs
+🌐 API docs: https://pablodomi.github.io/Vyte/api-reference/
 ```
 
 ______________________________________________________________________

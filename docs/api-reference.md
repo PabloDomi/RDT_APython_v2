@@ -813,4 +813,4 @@ ______________________________________________________________________
 - [Quick Start](quickstart.md) - Get started with Vyte
 - [Configuration](configuration.md) - Configure your projects
 - [CLI Reference](cli.md) - Command-line interface
-- [GitHub Repository](https://github.com/yourusername/vyte)
+- [GitHub Repository](https://github.com/PabloDomi/Vyte)

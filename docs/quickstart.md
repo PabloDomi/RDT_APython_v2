@@ -380,8 +380,8 @@ ______________________________________________________________________
 - 📖 [Configuration Guide](configuration.md)
 - 🗄️ [Database Guide](databases.md)
 - 🚀 [Framework Comparison](frameworks.md)
-- 💬 [GitHub Discussions](https://github.com/yourusername/vyte/discussions)
-- 🐛 [Report Issues](https://github.com/yourusername/vyte/issues)
+- 💬 [GitHub Discussions](https://github.com/PabloDomi/Vyte/discussions)
+- 🐛 [Report Issues](https://github.com/PabloDomi/Vyte/issues)
 
 ______________________________________________________________________
 

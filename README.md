@@ -198,9 +198,10 @@ docker-compose down
 
 ## 📚 Documentation
 
-- [Full Documentation](https://vyte.readthedocs.io)
-- [API Reference](https://vyte.readthedocs.io/api)
-- [Examples](./examples)
+- [Full Documentation](https://pablodomi.github.io/Vyte/)
+- [Quick Start Guide](https://pablodomi.github.io/Vyte/quickstart/)
+- [CLI Reference](https://pablodomi.github.io/Vyte/cli/)
+- [API Reference](https://pablodomi.github.io/Vyte/api-reference/)
 
 ## 🤝 Contributing
 
@@ -258,7 +259,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 - **Test Coverage**: 73%
 - **Code Quality**: A+ (Ruff, Black)
 - **Security**: Scanned with Bandit
-- **Python Versions**: 3.11, 3.12, 3.13
+- **Python Versions**: 3.11, 3.12
 - **Platforms**: Linux, macOS, Windows
 
 ## 📧 Contact
