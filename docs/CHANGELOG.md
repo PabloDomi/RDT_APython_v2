@@ -5,6 +5,56 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.5] - 2025-11-17
+
+### Added
+
+- **Comprehensive MkDocs documentation website** with Material theme
+  - 7 complete documentation pages: index, quickstart, cli, frameworks, databases, configuration, api-reference
+  - Professional Material theme with custom colors (cyan/deep purple)
+  - Integrated Vyte logos in header and favicon
+  - Search functionality
+  - Git revision date plugin for last modified timestamps
+  - mkdocstrings for automatic API documentation
+  - Full navigation structure with 6 main sections
+- **GitHub Actions workflow for automatic documentation deployment**
+  - Automatic deployment to GitHub Pages on push to main
+  - Triggered by changes in docs/, mkdocs.yml, or source code
+  - Python dependency caching for faster builds
+- **Documentation dependencies** in pyproject.toml
+  - mkdocs >= 1.5.0
+  - mkdocs-material >= 9.5.0
+  - mkdocstrings\[python\] >= 0.24.0
+  - mkdocs-git-revision-date-localized-plugin >= 1.2.0
+- **Branding assets**
+  - 5 logo variants in docs/images/ folder
+  - BRANDING.md guide for logo usage
+  - Documentation badge in README.md
+
+### Fixed
+
+- Logo visibility in documentation header (changed to B&W version for better contrast)
+- Broken links in documentation files (README.md, docs/ paths)
+- Logo path in index.md (corrected to relative images/ path)
+- MkDocs build warnings and strict mode errors
+
+### Changed
+
+- Added documentation link badge to README.md
+- Copied SECURITY.md to docs/ folder for MkDocs access
+- Added site/ folder to .gitignore
+- Updated mkdocs.yml to use B&W logo for better header contrast
+
+### Documentation
+
+- **Quick Start Guide**: Complete installation and first project tutorial
+- **CLI Reference**: Full command documentation with examples and tips
+- **Frameworks Guide**: Detailed comparison of FastAPI, Flask-Restx, Django-Rest
+- **Databases Guide**: Comprehensive ORM and database documentation
+- **Configuration Guide**: Environment variables and settings reference
+- **API Reference**: Complete Python API documentation
+- **Home Page**: Feature overview, philosophy, and use cases
+
 ## [2.0.4] - 2025-11-13
 
 ### Added
@@ -99,3 +149,4 @@ ______________________________________________________________________
 [2.0.0]: https://github.com/PabloDomi/Vyte/releases/tag/v2.0.0
 [2.0.3]: https://github.com/PabloDomi/Vyte/compare/v2.0.0...v2.0.3
 [2.0.4]: https://github.com/PabloDomi/Vyte/compare/v2.0.3...v2.0.4
+[2.0.5]: https://github.com/PabloDomi/Vyte/compare/v2.0.4...v2.0.5
